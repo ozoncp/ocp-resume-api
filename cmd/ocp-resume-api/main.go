@@ -7,5 +7,5 @@ import (
 )
 
 func main() {
-	fmt.Printf("hello world %v", emoji.WavingHand.Tone(emoji.Dark))
+	fmt.Printf("It's resume API written by Pimenov Denis. Hello %v", emoji.WavingHand.Tone(emoji.Light))
 }
