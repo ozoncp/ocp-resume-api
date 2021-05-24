@@ -3,6 +3,9 @@ package utils
 import (
 	"fmt"
 	"testing"
+
+	"github.com/ozoncp/ocp-resume-api/internal/achievement"
+	"github.com/ozoncp/ocp-resume-api/internal/resume"
 )
 
 func TestSplitBatches(t *testing.T) {
@@ -42,4 +45,68 @@ func TestFilterElements(t *testing.T) {
 func TestLoopFileOpen(t *testing.T) {
 	isOk := LoopFileOpen([]string{"qwe.txt", "asd.txt", "zxc.txt"})
 	fmt.Printf("%v\n", isOk)
+}
+
+func TestSplitAchievementToBatches(t *testing.T) {
+	arr := []achievement.Achievement{}
+	i := uint(0)
+	for {
+		if i == 10 {
+			break
+		}
+		tmp_achiv := achievement.New()
+		tmp_achiv.Init(i, fmt.Sprintf("Ach%d", i), "Some ach")
+		arr = append(arr, *tmp_achiv)
+		i += 1
+	}
+	res, isOk := SplitAchievementToBatches(arr, 3, true)
+	fmt.Printf("%v, %v\n", res, isOk)
+}
+
+func TestMapAchievements(t *testing.T) {
+	arr := []achievement.Achievement{}
+	i := uint(0)
+	for {
+		if i == 10 {
+			break
+		}
+		tmp_achiv := achievement.New()
+		tmp_achiv.Init(i, fmt.Sprintf("Ach%d", i), "Some ach")
+		arr = append(arr, *tmp_achiv)
+		i += 1
+	}
+	res, isOk := MapAchievements(arr)
+	fmt.Printf("%v, %v\n", res, isOk)
+}
+
+func TestSplitResumesToBatches(t *testing.T) {
+	arr := []resume.Resume{}
+	i := uint(0)
+	for {
+		if i == 10 {
+			break
+		}
+		tmp_achiv := resume.New()
+		tmp_achiv.Init(i, i+100)
+		arr = append(arr, *tmp_achiv)
+		i += 1
+	}
+	res, isOk := SplitResumesToBatches(arr, 3, true)
+	fmt.Printf("%v, %v\n", res, isOk)
+}
+
+func TestMapResumes(t *testing.T) {
+	arr := []resume.Resume{}
+	i := uint(0)
+	for {
+		if i == 10 {
+			break
+		}
+		tmp_achiv := resume.New()
+		tmp_achiv.Init(i, i+100)
+		arr = append(arr, *tmp_achiv)
+		i += 1
+	}
+	res, isOk := MapResumes(arr)
+	fmt.Printf("%v, %v\n", res, isOk)
 }

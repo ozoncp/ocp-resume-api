@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"math"
 	"os"
+
+	"github.com/ozoncp/ocp-resume-api/internal/achievement"
+	"github.com/ozoncp/ocp-resume-api/internal/resume"
 )
 
 func SplitBatches(sourceArr []int, batch_size int, align_last bool) ([][]int, bool) {
@@ -82,4 +85,90 @@ func LoopFileOpen(paths []string) error {
 		}
 	}
 	return nil
+}
+
+func SplitAchievementToBatches(sourceArr []achievement.Achievement, batch_size int, align_last bool) ([][]achievement.Achievement, bool) {
+	if sourceArr == nil || batch_size <= 0 {
+		return nil, false
+	}
+	src_len := len(sourceArr)
+	batch_count := int(math.Ceil(float64(src_len) / float64(batch_size)))
+
+	res := make([][]achievement.Achievement, batch_count)
+
+	for ndx, src_val := range sourceArr {
+		res_ndx := ndx / batch_size
+		inside_ndx := ndx % batch_size
+		if inside_ndx == 0 {
+			if align_last {
+				res[res_ndx] = make([]achievement.Achievement, batch_size)
+			} else {
+				res[res_ndx] = make([]achievement.Achievement, 0, batch_size)
+			}
+
+		}
+		if align_last {
+			res[res_ndx][inside_ndx] = src_val
+		} else {
+			res[res_ndx] = append(res[res_ndx], src_val)
+		}
+
+	}
+
+	return res, true
+}
+
+func MapAchievements(sourceArr []achievement.Achievement) (map[uint]achievement.Achievement, bool) {
+	res := make(map[uint]achievement.Achievement, len(sourceArr))
+	for _, src_val := range sourceArr {
+		if _, found := res[src_val.Id]; found {
+			panic(fmt.Sprintf("Value %v exists twice!", src_val.String()))
+			//return nil, false
+		}
+		res[src_val.Id] = src_val
+	}
+	return res, true
+}
+
+func SplitResumesToBatches(sourceArr []resume.Resume, batch_size int, align_last bool) ([][]resume.Resume, bool) {
+	if sourceArr == nil || batch_size <= 0 {
+		return nil, false
+	}
+	src_len := len(sourceArr)
+	batch_count := int(math.Ceil(float64(src_len) / float64(batch_size)))
+
+	res := make([][]resume.Resume, batch_count)
+
+	for ndx, src_val := range sourceArr {
+		res_ndx := ndx / batch_size
+		inside_ndx := ndx % batch_size
+		if inside_ndx == 0 {
+			if align_last {
+				res[res_ndx] = make([]resume.Resume, batch_size)
+			} else {
+				res[res_ndx] = make([]resume.Resume, 0, batch_size)
+			}
+
+		}
+		if align_last {
+			res[res_ndx][inside_ndx] = src_val
+		} else {
+			res[res_ndx] = append(res[res_ndx], src_val)
+		}
+
+	}
+
+	return res, true
+}
+
+func MapResumes(sourceArr []resume.Resume) (map[uint]resume.Resume, bool) {
+	res := make(map[uint]resume.Resume, len(sourceArr))
+	for _, src_val := range sourceArr {
+		if _, found := res[src_val.Id]; found {
+			panic(fmt.Sprintf("Value %v exists twice!", src_val.String()))
+			//return nil, false
+		}
+		res[src_val.Id] = src_val
+	}
+	return res, true
 }
