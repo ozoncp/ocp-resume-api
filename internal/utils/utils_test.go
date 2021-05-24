@@ -38,3 +38,8 @@ func TestFilterElements(t *testing.T) {
 	arr, isOk := FilterElements(arr, flt)
 	fmt.Printf("%v, %v\n", arr, isOk)
 }
+
+func TestLoopFileOpen(t *testing.T) {
+	isOk := LoopFileOpen([]string{"qwe.txt", "asd.txt", "zxc.txt"})
+	fmt.Printf("%v\n", isOk)
+}

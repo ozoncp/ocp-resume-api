@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"math"
+	"os"
 )
 
 func SplitBatches(sourceArr []int, batch_size int, align_last bool) ([][]int, bool) {
@@ -63,4 +64,22 @@ func FilterElements(sourceArray []rune, filterArray []rune) ([]rune, bool) {
 		}
 	}
 	return res, true
+}
+
+func LoopFileOpen(paths []string) error {
+	open_and_close := func(file_path string, write_string string) error {
+		fp, err := os.OpenFile(file_path, os.O_RDWR|os.O_CREATE, 0777)
+		if err == nil {
+			defer fp.Close()
+			fp.Write([]byte(write_string))
+		}
+		return err
+	}
+	for _, path := range paths {
+		err := open_and_close(path, path)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

@@ -24,4 +24,6 @@ func main() {
 	fmt.Printf("Filter: %v\n", flt_for_arr)
 	filtered, isOk := utils.FilterElements(arr_to_filter, flt_for_arr)
 	fmt.Printf("%v, %v\n", filtered, isOk)
+
+	_ = utils.LoopFileOpen([]string{"qwe.txt", "asd.txt", "zxc.txt"})
 }
