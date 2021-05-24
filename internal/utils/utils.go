@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"math"
 )
 
@@ -39,8 +40,8 @@ func InverseMap(sourceMap map[uint]string) (map[string]uint, bool) {
 	res := make(map[string]uint, len(sourceMap))
 	for src_key, src_val := range sourceMap {
 		if _, found := res[src_val]; found {
-			//panic(fmt.Sprintf("Value %v exists twice!", src_val))
-			return nil, false
+			panic(fmt.Sprintf("Value %v exists twice!", src_val))
+			//return nil, false
 		}
 		res[src_val] = src_key
 	}

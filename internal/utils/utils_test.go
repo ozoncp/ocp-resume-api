@@ -14,6 +14,11 @@ func TestSplitBatches(t *testing.T) {
 }
 
 func TestInverseMap(t *testing.T) {
+	defer func() {
+		if obj := recover(); obj != nil {
+			fmt.Println(obj)
+		}
+	}()
 	tst := map[uint]string{0: "Zero", 1: "One", 3: "Three"}
 	res, isOk := InverseMap(tst)
 	fmt.Printf("%v, %v\n", res, isOk)
