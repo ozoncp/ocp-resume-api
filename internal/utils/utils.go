@@ -74,7 +74,14 @@ func LoopFileOpen(paths []string) error {
 		fp, err := os.OpenFile(file_path, os.O_RDWR|os.O_CREATE, 0777)
 		if err == nil {
 			defer fp.Close()
-			fp.Write([]byte(write_string))
+			need_to_write := len([]byte(write_string))
+			writed, err := fp.Write([]byte(write_string))
+			if err != nil {
+				return err
+			}
+			if writed != need_to_write {
+				fmt.Printf("Writed %v bytes out of %v", writed, need_to_write)
+			}
 		}
 		return err
 	}
