@@ -8,6 +8,7 @@ type Achievement struct {
 	Description string
 }
 
+
 func New() *Achievement {
 	return &Achievement{
 		Id:          0,

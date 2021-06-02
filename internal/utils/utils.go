@@ -87,7 +87,7 @@ func LoopFileOpen(paths []string) error {
 	return nil
 }
 
-func SplitAchievementToBatches(sourceArr []achievement.Achievement, batch_size int, align_last bool) ([][]achievement.Achievement, bool) {
+func SplitAchievementsToBatches(sourceArr []achievement.Achievement, batch_size int, align_last bool) ([][]achievement.Achievement, bool) {
 	if sourceArr == nil || batch_size <= 0 {
 		return nil, false
 	}
