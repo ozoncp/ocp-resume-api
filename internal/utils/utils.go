@@ -99,7 +99,10 @@ func SplitAchievementsToBatches(sourceArr []achievement.Achievement, batch_size 
 		return nil, false
 	}
 	src_len := len(sourceArr)
-	batch_count := int(math.Ceil(float64(src_len) / float64(batch_size)))
+	batch_count := src_len / batch_size
+	if src_len%batch_size > 0 {
+		batch_count += 1
+	}
 
 	res := make([][]achievement.Achievement, batch_count)
 
@@ -142,7 +145,10 @@ func SplitResumesToBatches(sourceArr []resume.Resume, batch_size int, align_last
 		return nil, false
 	}
 	src_len := len(sourceArr)
-	batch_count := int(math.Ceil(float64(src_len) / float64(batch_size)))
+	batch_count := src_len / batch_size
+	if src_len%batch_size > 0 {
+		batch_count += 1
+	}
 
 	res := make([][]resume.Resume, batch_count)
 

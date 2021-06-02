@@ -57,9 +57,6 @@ func NewFlushAchievementsOnly(achievement_repo repo.Repo, achievements_batchsize
 }
 
 func (f *flusher) FlushResumes(r []resume.Resume) ([]resume.Resume, error) {
-	if f == nil {
-		return r, errors.New("flusher not created")
-	}
 	batches, ok := utils.SplitResumesToBatches(r, int(f.resumes_batchsize), false)
 	if !ok {
 		return r, errors.New("can't split resumes to batches")
@@ -75,9 +72,6 @@ func (f *flusher) FlushResumes(r []resume.Resume) ([]resume.Resume, error) {
 }
 
 func (f *flusher) FlushAchievements(r []achievement.Achievement) ([]achievement.Achievement, error) {
-	if f == nil {
-		return r, errors.New("flusher not created")
-	}
 	batches, ok := utils.SplitAchievementsToBatches(r, int(f.achievements_batchsize), false)
 	if !ok {
 		return r, errors.New("can't split achievements to batches")

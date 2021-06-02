@@ -1,6 +1,8 @@
 package flusher_test
 
 import (
+	"errors"
+
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -32,7 +34,6 @@ var _ = Describe("Flusher", func() {
 	})
 
 	JustBeforeEach(func() {
-		f = flusher.NewFlusher(mockRepo, resume_bsize, ach_bsize)
 		ret_achievements, err1 = f.FlushAchievements(achievements)
 		ret_resumes, err2 = f.FlushResumes(resumes)
 	})
@@ -41,21 +42,153 @@ var _ = Describe("Flusher", func() {
 		ctrl.Finish()
 	})
 
-	Context("got empty arrays", func() {
-		BeforeEach(func() {
-			ach_bsize = 32
-			resume_bsize = 16
-			achievements = []achievement.Achievement{}
-			resumes = []resume.Resume{}
-			mockRepo.EXPECT().AddAchievements(achievements).Return(nil).MaxTimes(0)
-			mockRepo.EXPECT().AddResumes(resumes).Return(nil).MaxTimes(0)
+	When("only achievements", func() {
+		Context("got empty array", func() {
+			BeforeEach(func() {
+				achievements = []achievement.Achievement{}
+				ach_bsize = 32
+				f = flusher.NewFlushAchievementsOnly(mockRepo, ach_bsize)
+				mockRepo.EXPECT().AddAchievements(achievements).Return(nil).Times(0)
+				mockRepo.EXPECT().AddResumes(resumes).Return(nil).Times(0)
+			})
+			It("result", func() {
+				//Expect(err).Should(BeNil())
+				Expect(ret_achievements).Should(BeEmpty())
+				Expect(ret_resumes).Should(BeEmpty())
+				Expect(err1).Should(BeNil())
+				Expect(err2).Should(MatchError("can't split resumes to batches"))
+			})
 		})
-		It("result", func() {
-			//Expect(err).Should(BeNil())
-			Expect(ret_achievements).Should(BeEmpty())
-			Expect(ret_resumes).Should(BeEmpty())
-			Expect(err1).Should(BeNil())
-			Expect(err2).Should(BeNil())
+		Context("got elements in array less then bsize", func() {
+			BeforeEach(func() {
+				ach_bsize = 32
+				achievements = make([]achievement.Achievement, 2)
+				resumes = make([]resume.Resume, 3)
+				f = flusher.NewFlushAchievementsOnly(mockRepo, ach_bsize)
+				mockRepo.EXPECT().AddAchievements(achievements).Return(nil).Times(1)
+				mockRepo.EXPECT().AddResumes(resumes).Return(errors.New("Resume not created")).Times(0)
+			})
+			It("result", func() {
+				//Expect(err).Should(BeNil())
+				Expect(ret_achievements).Should(BeEmpty())
+				Expect(ret_resumes).Should(Equal(resumes))
+				Expect(err1).Should(BeNil())
+				Expect(err2).Should(MatchError("can't split resumes to batches"))
+			})
 		})
 	})
+
+	When("only resumes", func() {
+		Context("got empty array", func() {
+			BeforeEach(func() {
+				achievements = []achievement.Achievement{}
+				resumes = []resume.Resume{}
+				resume_bsize = 32
+				f = flusher.NewFlusherResumeOnly(mockRepo, resume_bsize)
+				mockRepo.EXPECT().AddAchievements(achievements).Return(nil).Times(0)
+				mockRepo.EXPECT().AddResumes(resumes).Return(nil).Times(0)
+			})
+			It("result", func() {
+				//Expect(err).Should(BeNil())
+				Expect(ret_achievements).Should(BeEmpty())
+				Expect(ret_resumes).Should(BeEmpty())
+				Expect(err1).Should(MatchError("can't split achievements to batches"))
+				Expect(err2).Should(BeNil())
+			})
+		})
+		Context("got elements in array less then bsize", func() {
+			BeforeEach(func() {
+				resume_bsize = 16
+				achievements = make([]achievement.Achievement, 2)
+				resumes = make([]resume.Resume, 3)
+				f = flusher.NewFlusherResumeOnly(mockRepo, resume_bsize)
+				mockRepo.EXPECT().AddAchievements(achievements).Return(errors.New("Achievements not created")).Times(0)
+				mockRepo.EXPECT().AddResumes(resumes).Return(nil).Times(1)
+			})
+			It("result", func() {
+				//Expect(err).Should(BeNil())
+				Expect(ret_achievements).Should(Equal(achievements))
+				Expect(ret_resumes).Should(BeEmpty())
+				Expect(err1).Should(MatchError("can't split achievements to batches"))
+				Expect(err2).Should(BeNil())
+			})
+		})
+	})
+
+	When("full flusher", func() {
+		Context("got empty array", func() {
+			BeforeEach(func() {
+				achievements = []achievement.Achievement{}
+				resumes = []resume.Resume{}
+				resume_bsize = 16
+				ach_bsize = 32
+				f = flusher.NewFlusher(mockRepo, resume_bsize, ach_bsize)
+				mockRepo.EXPECT().AddAchievements(achievements).Return(nil).Times(0)
+				mockRepo.EXPECT().AddResumes(resumes).Return(nil).Times(0)
+			})
+			It("result", func() {
+				//Expect(err).Should(BeNil())
+				Expect(ret_achievements).Should(BeEmpty())
+				Expect(ret_resumes).Should(BeEmpty())
+				Expect(err1).Should(BeNil())
+				Expect(err2).Should(BeNil())
+			})
+		})
+		Context("got elements in array less then bsize", func() {
+			BeforeEach(func() {
+				ach_bsize = 32
+				resume_bsize = 16
+				achievements = make([]achievement.Achievement, 2)
+				resumes = make([]resume.Resume, 3)
+				f = flusher.NewFlusher(mockRepo, resume_bsize, ach_bsize)
+				mockRepo.EXPECT().AddAchievements(achievements).Return(nil).Times(1)
+				mockRepo.EXPECT().AddResumes(resumes).Return(nil).Times(1)
+			})
+			It("result", func() {
+				//Expect(err).Should(BeNil())
+				Expect(ret_achievements).Should(BeEmpty())
+				Expect(ret_resumes).Should(BeEmpty())
+				Expect(err1).Should(BeNil())
+				Expect(err2).Should(BeNil())
+			})
+		})
+		Context("got elements in array more then bsize", func() {
+			BeforeEach(func() {
+				ach_bsize = 4
+				resume_bsize = 4
+				achievements = make([]achievement.Achievement, 8)
+				resumes = make([]resume.Resume, 7)
+				f = flusher.NewFlusher(mockRepo, resume_bsize, ach_bsize)
+				mockRepo.EXPECT().AddAchievements(gomock.Any()).Return(nil).Times(2)
+				mockRepo.EXPECT().AddResumes(gomock.Any()).Return(nil).Times(2)
+			})
+			It("result", func() {
+				//Expect(err).Should(BeNil())
+				Expect(ret_achievements).Should(BeEmpty())
+				Expect(ret_resumes).Should(BeEmpty())
+				Expect(err1).Should(BeNil())
+				Expect(err2).Should(BeNil())
+			})
+		})
+		Context("got elements in array and have an error in repo", func() {
+			BeforeEach(func() {
+				ach_bsize = 4
+				resume_bsize = 3
+				achievements = make([]achievement.Achievement, 16)
+				resumes = make([]resume.Resume, 9)
+				f = flusher.NewFlusher(mockRepo, resume_bsize, ach_bsize)
+				mockRepo.EXPECT().AddAchievements(gomock.Any()).Return(nil).Times(2)
+				mockRepo.EXPECT().AddAchievements(gomock.Any()).Return(errors.New("error")).Times(2)
+				mockRepo.EXPECT().AddResumes(gomock.Any()).Return(errors.New("error")).Times(3)
+			})
+			It("result", func() {
+				//Expect(err).Should(BeNil())
+				Expect(ret_achievements).ShouldNot(BeEmpty())
+				Expect(ret_resumes).Should(BeEquivalentTo(resumes))
+				Expect(err1).Should(BeNil())
+				Expect(err2).Should(BeNil())
+			})
+		})
+	})
+
 })
