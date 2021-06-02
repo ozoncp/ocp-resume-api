@@ -59,7 +59,7 @@ func TestSplitAchievementToBatches(t *testing.T) {
 		arr = append(arr, *tmp_achiv)
 		i += 1
 	}
-	res, isOk := SplitAchievementToBatches(arr, 3, true)
+	res, isOk := SplitAchievementsToBatches(arr, 3, true)
 	fmt.Printf("%v, %v\n", res, isOk)
 }
 

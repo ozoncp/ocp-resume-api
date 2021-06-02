@@ -23,9 +23,37 @@ type Flusher interface {
 }
 
 type flusher struct {
-	repo                   repo.Repo
+	repoResume             repo.RepoResume
+	repoAchievement        repo.RepoAchievement
 	resumes_batchsize      uint64
 	achievements_batchsize uint64
+}
+
+func NewFlusher(full_repo repo.Repo, resumes_batchsize uint64, achievements_batchsize uint64) Flusher {
+	return &flusher{
+		repoResume:             full_repo,
+		repoAchievement:        full_repo,
+		resumes_batchsize:      resumes_batchsize,
+		achievements_batchsize: achievements_batchsize,
+	}
+}
+
+func NewFlusherResumeOnly(resume_repo repo.RepoResume, resumes_batchsize uint64) Flusher {
+	return &flusher{
+		repoResume:             resume_repo,
+		repoAchievement:        nil,
+		resumes_batchsize:      resumes_batchsize,
+		achievements_batchsize: 0,
+	}
+}
+
+func NewFlushAchievementsOnly(achievement_repo repo.Repo, achievements_batchsize uint64) Flusher {
+	return &flusher{
+		repoResume:             nil,
+		repoAchievement:        achievement_repo,
+		resumes_batchsize:      0,
+		achievements_batchsize: achievements_batchsize,
+	}
 }
 
 func (f *flusher) FlushResumes(r []resume.Resume) ([]resume.Resume, error) {
@@ -38,7 +66,7 @@ func (f *flusher) FlushResumes(r []resume.Resume) ([]resume.Resume, error) {
 	}
 	ret_arr := make([]resume.Resume, 0, len(r))
 	for _, batch := range batches {
-		err := f.repo.AddResumes(batch)
+		err := f.repoResume.AddResumes(batch)
 		if err != nil {
 			ret_arr = append(ret_arr, batch...)
 		}
@@ -56,7 +84,7 @@ func (f *flusher) FlushAchievements(r []achievement.Achievement) ([]achievement.
 	}
 	ret_arr := make([]achievement.Achievement, 0, len(r))
 	for _, batch := range batches {
-		err := f.repo.AddAchievements(batch)
+		err := f.repoAchievement.AddAchievements(batch)
 		if err != nil {
 			ret_arr = append(ret_arr, batch...)
 		}
