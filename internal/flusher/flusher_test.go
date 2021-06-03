@@ -51,7 +51,7 @@ var _ = Describe("Flusher", func() {
 				mockRepo.EXPECT().AddAchievements(achievements).Return(nil).Times(0)
 				mockRepo.EXPECT().AddResumes(resumes).Return(nil).Times(0)
 			})
-			It("result", func() {
+			It("return empty array and no error for achievements flush and error for resume flush", func() {
 				//Expect(err).Should(BeNil())
 				Expect(ret_achievements).Should(BeEmpty())
 				Expect(ret_resumes).Should(BeEmpty())
@@ -68,7 +68,7 @@ var _ = Describe("Flusher", func() {
 				mockRepo.EXPECT().AddAchievements(achievements).Return(nil).Times(1)
 				mockRepo.EXPECT().AddResumes(resumes).Return(errors.New("Resume not created")).Times(0)
 			})
-			It("result", func() {
+			It("return empty array and no error for achievements flush and input array and error for resume flush", func() {
 				//Expect(err).Should(BeNil())
 				Expect(ret_achievements).Should(BeEmpty())
 				Expect(ret_resumes).Should(Equal(resumes))
@@ -88,7 +88,7 @@ var _ = Describe("Flusher", func() {
 				mockRepo.EXPECT().AddAchievements(achievements).Return(nil).Times(0)
 				mockRepo.EXPECT().AddResumes(resumes).Return(nil).Times(0)
 			})
-			It("result", func() {
+			It("return empty array and no error for resume flush and error for achievement flush", func() {
 				//Expect(err).Should(BeNil())
 				Expect(ret_achievements).Should(BeEmpty())
 				Expect(ret_resumes).Should(BeEmpty())
@@ -105,7 +105,7 @@ var _ = Describe("Flusher", func() {
 				mockRepo.EXPECT().AddAchievements(achievements).Return(errors.New("Achievements not created")).Times(0)
 				mockRepo.EXPECT().AddResumes(resumes).Return(nil).Times(1)
 			})
-			It("result", func() {
+			It("return empty array and no error for resumes flush and input array and error for achievements flush", func() {
 				//Expect(err).Should(BeNil())
 				Expect(ret_achievements).Should(Equal(achievements))
 				Expect(ret_resumes).Should(BeEmpty())
@@ -126,7 +126,7 @@ var _ = Describe("Flusher", func() {
 				mockRepo.EXPECT().AddAchievements(achievements).Return(nil).Times(0)
 				mockRepo.EXPECT().AddResumes(resumes).Return(nil).Times(0)
 			})
-			It("result", func() {
+			It("return empty array and no error for achievements and resumes", func() {
 				//Expect(err).Should(BeNil())
 				Expect(ret_achievements).Should(BeEmpty())
 				Expect(ret_resumes).Should(BeEmpty())
@@ -144,7 +144,7 @@ var _ = Describe("Flusher", func() {
 				mockRepo.EXPECT().AddAchievements(achievements).Return(nil).Times(1)
 				mockRepo.EXPECT().AddResumes(resumes).Return(nil).Times(1)
 			})
-			It("result", func() {
+			It("return empty array and no error for achievements and resumes (functions add calls ones)", func() {
 				//Expect(err).Should(BeNil())
 				Expect(ret_achievements).Should(BeEmpty())
 				Expect(ret_resumes).Should(BeEmpty())
@@ -162,7 +162,7 @@ var _ = Describe("Flusher", func() {
 				mockRepo.EXPECT().AddAchievements(gomock.Any()).Return(nil).Times(2)
 				mockRepo.EXPECT().AddResumes(gomock.Any()).Return(nil).Times(2)
 			})
-			It("result", func() {
+			It("return empty array and no error for achievements and resumes (functions add calls twice)", func() {
 				//Expect(err).Should(BeNil())
 				Expect(ret_achievements).Should(BeEmpty())
 				Expect(ret_resumes).Should(BeEmpty())
@@ -181,7 +181,7 @@ var _ = Describe("Flusher", func() {
 				mockRepo.EXPECT().AddAchievements(gomock.Any()).Return(errors.New("error")).Times(2)
 				mockRepo.EXPECT().AddResumes(gomock.Any()).Return(errors.New("error")).Times(3)
 			})
-			It("result", func() {
+			It("return not empty arrays and no error for achievements and resumes (in case with resumes returned array like input)", func() {
 				//Expect(err).Should(BeNil())
 				Expect(ret_achievements).ShouldNot(BeEmpty())
 				Expect(ret_resumes).Should(BeEquivalentTo(resumes))
