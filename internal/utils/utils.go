@@ -74,7 +74,14 @@ func LoopFileOpen(paths []string) error {
 		fp, err := os.OpenFile(file_path, os.O_RDWR|os.O_CREATE, 0777)
 		if err == nil {
 			defer fp.Close()
-			fp.Write([]byte(write_string))
+			need_to_write := len([]byte(write_string))
+			writed, err := fp.Write([]byte(write_string))
+			if err != nil {
+				return err
+			}
+			if writed != need_to_write {
+				fmt.Printf("Writed %v bytes out of %v", writed, need_to_write)
+			}
 		}
 		return err
 	}
@@ -87,12 +94,15 @@ func LoopFileOpen(paths []string) error {
 	return nil
 }
 
-func SplitAchievementToBatches(sourceArr []achievement.Achievement, batch_size int, align_last bool) ([][]achievement.Achievement, bool) {
+func SplitAchievementsToBatches(sourceArr []achievement.Achievement, batch_size int, align_last bool) ([][]achievement.Achievement, bool) {
 	if sourceArr == nil || batch_size <= 0 {
 		return nil, false
 	}
 	src_len := len(sourceArr)
-	batch_count := int(math.Ceil(float64(src_len) / float64(batch_size)))
+	batch_count := src_len / batch_size
+	if src_len%batch_size > 0 {
+		batch_count += 1
+	}
 
 	res := make([][]achievement.Achievement, batch_count)
 
@@ -135,7 +145,10 @@ func SplitResumesToBatches(sourceArr []resume.Resume, batch_size int, align_last
 		return nil, false
 	}
 	src_len := len(sourceArr)
-	batch_count := int(math.Ceil(float64(src_len) / float64(batch_size)))
+	batch_count := src_len / batch_size
+	if src_len%batch_size > 0 {
+		batch_count += 1
+	}
 
 	res := make([][]resume.Resume, batch_count)
 
