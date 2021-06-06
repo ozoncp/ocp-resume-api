@@ -2,43 +2,10 @@ package utils
 
 import (
 	"fmt"
-	"math"
-	"os"
 
 	"github.com/ozoncp/ocp-resume-api/internal/achievement"
 	"github.com/ozoncp/ocp-resume-api/internal/resume"
 )
-
-func SplitBatches(sourceArr []int, batch_size int, align_last bool) ([][]int, bool) {
-	if sourceArr == nil || batch_size <= 0 {
-		return nil, false
-	}
-	src_len := len(sourceArr)
-	batch_count := int(math.Ceil(float64(src_len) / float64(batch_size)))
-
-	res := make([][]int, batch_count)
-
-	for ndx, src_val := range sourceArr {
-		res_ndx := ndx / batch_size
-		inside_ndx := ndx % batch_size
-		if inside_ndx == 0 {
-			if align_last {
-				res[res_ndx] = make([]int, batch_size)
-			} else {
-				res[res_ndx] = make([]int, 0, batch_size)
-			}
-
-		}
-		if align_last {
-			res[res_ndx][inside_ndx] = src_val
-		} else {
-			res[res_ndx] = append(res[res_ndx], src_val)
-		}
-
-	}
-
-	return res, true
-}
 
 func InverseMap(sourceMap map[uint]string) (map[string]uint, bool) {
 	res := make(map[string]uint, len(sourceMap))
@@ -67,31 +34,6 @@ func FilterElements(sourceArray []rune, filterArray []rune) ([]rune, bool) {
 		}
 	}
 	return res, true
-}
-
-func LoopFileOpen(paths []string) error {
-	open_and_close := func(file_path string, write_string string) error {
-		fp, err := os.OpenFile(file_path, os.O_RDWR|os.O_CREATE, 0777)
-		if err == nil {
-			defer fp.Close()
-			need_to_write := len([]byte(write_string))
-			writed, err := fp.Write([]byte(write_string))
-			if err != nil {
-				return err
-			}
-			if writed != need_to_write {
-				fmt.Printf("Writed %v bytes out of %v", writed, need_to_write)
-			}
-		}
-		return err
-	}
-	for _, path := range paths {
-		err := open_and_close(path, path)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func SplitAchievementsToBatches(sourceArr []achievement.Achievement, batch_size int, align_last bool) ([][]achievement.Achievement, bool) {
@@ -184,4 +126,32 @@ func MapResumes(sourceArr []resume.Resume) (map[uint]resume.Resume, bool) {
 		res[src_val.Id] = src_val
 	}
 	return res, true
+}
+
+func SaveAchievements(dst []achievement.Achievement, src []achievement.Achievement, capacity int, samart_del bool) []achievement.Achievement {
+	if len(dst)+len(src) > capacity {
+		del_count := int(0)
+		if samart_del {
+			del_count = capacity - len(dst) - len(src)
+		} else {
+			del_count = len(dst) - 1
+		}
+		copy(dst, dst[del_count:])
+		dst = dst[:len(dst)-del_count]
+	}
+	return append(dst, src...)
+}
+
+func SaveResumes(dst []resume.Resume, src []resume.Resume, capacity int, samart_del bool) []resume.Resume {
+	if len(dst)+len(src) > capacity {
+		del_count := int(0)
+		if samart_del {
+			del_count = capacity - len(dst) - len(src)
+		} else {
+			del_count = len(dst) - 1
+		}
+		copy(dst, dst[del_count:])
+		dst = dst[:len(dst)-del_count]
+	}
+	return append(dst, src...)
 }
