@@ -1,6 +1,7 @@
 package saver_test
 
 import (
+	"errors"
 	"time"
 
 	"github.com/golang/mock/gomock"
@@ -71,6 +72,25 @@ var _ = Describe("Saver", func() {
 			timeout = 100 * int64(time.Millisecond)
 			wait_time = 350 * time.Millisecond
 			mockFlusher.EXPECT().FlushAchievements(gomock.Any()).Return([]achievement.Achievement{}, nil).Times(4)
+			mockFlusher.EXPECT().FlushResumes(gomock.Any()).Return([]resume.Resume{}, nil).Times(4)
+		})
+		It("flusher takes 4 Call", func() {
+			s = saver.NewSaver(mockFlusher, achievements_cap, resumes_cap)
+			err = s.Init(timeout, smart_del)
+			s.SaveAchievements(achievements)
+			s.SaveResumes(resumes)
+			time.Sleep(wait_time)
+			err = s.Close()
+		})
+	})
+
+	When("flush with errors", func() {
+		BeforeEach(func() {
+			timeout = 100 * int64(time.Millisecond)
+			wait_time = 350 * time.Millisecond
+			mockFlusher.EXPECT().FlushAchievements(achievements).Return(achievements, errors.New("error")).Times(3)
+			mockFlusher.EXPECT().FlushAchievements(gomock.Any()).Return([]achievement.Achievement{}, nil).Times(4)
+			mockFlusher.EXPECT().FlushResumes(resumes).Return(resumes, errors.New("error")).Times(3)
 			mockFlusher.EXPECT().FlushResumes(gomock.Any()).Return([]resume.Resume{}, nil).Times(4)
 		})
 		It("flusher takes 4 Call", func() {

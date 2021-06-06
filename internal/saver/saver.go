@@ -2,7 +2,6 @@ package saver
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 	"time"
 
@@ -57,22 +56,32 @@ func (s *saver) Init(timeout int64, smart_other_cap_del bool) error {
 	s.timer = time.NewTicker(time.Duration(timeout))
 	go func() {
 		for {
+			var is_closed bool
 			select {
 			case <-s.timer.C:
-				s.mutex_a.Lock()
-				s.flusher.FlushAchievements(s.achievements)
-				s.mutex_a.Unlock()
-				s.mutex_r.Lock()
-				s.flusher.FlushResumes(s.resumes)
-				s.mutex_r.Unlock()
-				fmt.Print("\n\n\ntimed\n\n\n")
+				is_closed = false
 			case <-s.close_channel:
-				s.mutex_a.Lock()
-				s.flusher.FlushAchievements(s.achievements)
-				s.mutex_a.Unlock()
-				s.mutex_r.Lock()
-				s.flusher.FlushResumes(s.resumes)
-				s.mutex_r.Unlock()
+				is_closed = true
+			}
+			s.mutex_a.Lock()
+			arr_a, err := s.flusher.FlushAchievements(s.achievements)
+			for try_count := int(3); try_count > 0; try_count-- {
+				if err == nil && len(arr_a) == 0 {
+					break
+				}
+				arr_a, err = s.flusher.FlushAchievements(arr_a)
+			}
+			s.mutex_a.Unlock()
+			s.mutex_r.Lock()
+			arr_r, err := s.flusher.FlushResumes(s.resumes)
+			for try_count := int(3); try_count > 0; try_count-- {
+				if err == nil && len(arr_r) == 0 {
+					break
+				}
+				arr_r, err = s.flusher.FlushResumes(arr_r)
+			}
+			s.mutex_r.Unlock()
+			if is_closed {
 				s.channel_closed <- struct{}{}
 				return
 			}
