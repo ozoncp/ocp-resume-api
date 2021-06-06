@@ -107,4 +107,5 @@ func TestSaveAchievements(t *testing.T) {
 	arr = SaveAchievements(arr, arr2, capac, false)
 	arr = SaveAchievements(arr, arr2, capac, false)
 	arr = SaveAchievements(arr, arr2, capac, false)
+	fmt.Printf("%v\n", arr)
 }
