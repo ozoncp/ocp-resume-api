@@ -23,65 +23,65 @@ type Flusher interface {
 }
 
 type flusher struct {
-	repoResume             repo.RepoResume
-	repoAchievement        repo.RepoAchievement
-	resumes_batchsize      uint64
-	achievements_batchsize uint64
+	repoResume            repo.RepoResume
+	repoAchievement       repo.RepoAchievement
+	resumesBatchSize      uint64
+	achievementsBatchSize uint64
 }
 
-func NewFlusher(full_repo repo.Repo, resumes_batchsize uint64, achievements_batchsize uint64) Flusher {
+func NewFlusher(fullRepo repo.Repo, resumesBatchSize uint64, achievementsBatchSize uint64) Flusher {
 	return &flusher{
-		repoResume:             full_repo,
-		repoAchievement:        full_repo,
-		resumes_batchsize:      resumes_batchsize,
-		achievements_batchsize: achievements_batchsize,
+		repoResume:            fullRepo,
+		repoAchievement:       fullRepo,
+		resumesBatchSize:      resumesBatchSize,
+		achievementsBatchSize: achievementsBatchSize,
 	}
 }
 
-func NewFlusherResumeOnly(resume_repo repo.RepoResume, resumes_batchsize uint64) Flusher {
+func NewFlusherResumeOnly(resumeRepo repo.RepoResume, resumesBatchSize uint64) Flusher {
 	return &flusher{
-		repoResume:             resume_repo,
-		repoAchievement:        nil,
-		resumes_batchsize:      resumes_batchsize,
-		achievements_batchsize: 0,
+		repoResume:            resumeRepo,
+		repoAchievement:       nil,
+		resumesBatchSize:      resumesBatchSize,
+		achievementsBatchSize: 0,
 	}
 }
 
-func NewFlushAchievementsOnly(achievement_repo repo.Repo, achievements_batchsize uint64) Flusher {
+func NewFlushAchievementsOnly(achievementRepo repo.Repo, achievementsBatchSize uint64) Flusher {
 	return &flusher{
-		repoResume:             nil,
-		repoAchievement:        achievement_repo,
-		resumes_batchsize:      0,
-		achievements_batchsize: achievements_batchsize,
+		repoResume:            nil,
+		repoAchievement:       achievementRepo,
+		resumesBatchSize:      0,
+		achievementsBatchSize: achievementsBatchSize,
 	}
 }
 
 func (f *flusher) FlushResumes(r []resume.Resume) ([]resume.Resume, error) {
-	batches, ok := utils.SplitResumesToBatches(r, int(f.resumes_batchsize), false)
+	batches, ok := utils.SplitResumesToBatches(r, int(f.resumesBatchSize), false)
 	if !ok {
 		return r, errors.New("can't split resumes to batches")
 	}
-	ret_arr := make([]resume.Resume, 0, len(r))
+	retArr := make([]resume.Resume, 0, len(r))
 	for _, batch := range batches {
 		err := f.repoResume.AddResumes(batch)
 		if err != nil {
-			ret_arr = append(ret_arr, batch...)
+			retArr = append(retArr, batch...)
 		}
 	}
-	return ret_arr, nil
+	return retArr, nil
 }
 
 func (f *flusher) FlushAchievements(r []achievement.Achievement) ([]achievement.Achievement, error) {
-	batches, ok := utils.SplitAchievementsToBatches(r, int(f.achievements_batchsize), false)
+	batches, ok := utils.SplitAchievementsToBatches(r, int(f.achievementsBatchSize), false)
 	if !ok {
 		return r, errors.New("can't split achievements to batches")
 	}
-	ret_arr := make([]achievement.Achievement, 0, len(r))
+	retArr := make([]achievement.Achievement, 0, len(r))
 	for _, batch := range batches {
 		err := f.repoAchievement.AddAchievements(batch)
 		if err != nil {
-			ret_arr = append(ret_arr, batch...)
+			retArr = append(retArr, batch...)
 		}
 	}
-	return ret_arr, nil
+	return retArr, nil
 }
