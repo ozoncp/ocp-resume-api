@@ -21,9 +21,9 @@ func MustNew() Resume {
 	}
 }
 
-func (r *Resume) Init(id uint, document_id uint) {
+func (r *Resume) Init(id uint, documentId uint) {
 	r.Id = id
-	r.DocumentId = document_id
+	r.DocumentId = documentId
 }
 
 func (r *Resume) Close() {

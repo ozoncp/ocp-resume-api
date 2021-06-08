@@ -8,14 +8,6 @@ import (
 	"github.com/ozoncp/ocp-resume-api/internal/resume"
 )
 
-func TestSplitBatches(t *testing.T) {
-	arr := []int{1, 2, 3, 4, 5}
-	b_arr, isOk := SplitBatches(arr, 2, false)
-	fmt.Printf("%v, %v\n", b_arr, isOk)
-	b_arr, isOk = SplitBatches(arr, 2, true)
-	fmt.Printf("%v, %v\n", b_arr, isOk)
-}
-
 func TestInverseMap(t *testing.T) {
 	defer func() {
 		if obj := recover(); obj != nil {
@@ -40,11 +32,6 @@ func TestFilterElements(t *testing.T) {
 	fmt.Printf("Filter: %v\n", flt)
 	arr, isOk := FilterElements(arr, flt)
 	fmt.Printf("%v, %v\n", arr, isOk)
-}
-
-func TestLoopFileOpen(t *testing.T) {
-	isOk := LoopFileOpen([]string{"qwe.txt", "asd.txt", "zxc.txt"})
-	fmt.Printf("%v\n", isOk)
 }
 
 func TestSplitAchievementToBatches(t *testing.T) {
@@ -109,4 +96,16 @@ func TestMapResumes(t *testing.T) {
 	}
 	res, isOk := MapResumes(arr)
 	fmt.Printf("%v, %v\n", res, isOk)
+}
+
+func TestSaveAchievements(t *testing.T) {
+	arr := make([]achievement.Achievement, 0, 20)
+	arr2 := make([]achievement.Achievement, 5)
+	capac := 20
+	arr = SaveAchievements(arr, arr2, capac, false)
+	arr = SaveAchievements(arr, arr2, capac, false)
+	arr = SaveAchievements(arr, arr2, capac, false)
+	arr = SaveAchievements(arr, arr2, capac, false)
+	arr = SaveAchievements(arr, arr2, capac, false)
+	fmt.Printf("%v\n", arr)
 }

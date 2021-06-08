@@ -40,14 +40,14 @@ func NewRepo(count uint64) Repo {
 	}
 }
 
-func (r *repo) AddResumes(resume_arr []resume.Resume) error {
+func (r *repo) AddResumes(resumeArr []resume.Resume) error {
 	if r == nil {
 		return errors.New("resume repo is not created")
 	}
 	return nil
 }
 
-func (r *repo) AddAchievements(achievement_arr []achievement.Achievement) error {
+func (r *repo) AddAchievements(achievementArr []achievement.Achievement) error {
 	if r == nil {
 		return errors.New("achievement repo is not created")
 	}
