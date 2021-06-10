@@ -31,5 +31,8 @@ func run() error {
 }
 
 func main() {
-	run()
+	err := run()
+	if err == nil {
+		log.Fatal()
+	}
 }
