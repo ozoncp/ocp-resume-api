@@ -1,0 +1,217 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/ocp-resume-api/ocp-resume-api.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/resumes": {
+      "get": {
+        "operationId": "OcpResumeApi_ListResumeV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiListResumesV1Response"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "OcpResumeApi"
+        ]
+      },
+      "post": {
+        "operationId": "OcpResumeApi_CreateResumeV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiCreateResumeV1Response"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "OcpResumeApi"
+        ]
+      }
+    },
+    "/v1/resumes/{ResumeId}": {
+      "get": {
+        "operationId": "OcpResumeApi_DescribeResumeV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiDescribeResumeV1Response"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ResumeId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "OcpResumeApi"
+        ]
+      },
+      "post": {
+        "operationId": "OcpResumeApi_RemoveResumeV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiRemoveResumeV1Response"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ResumeId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "OcpResumeApi"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "apiCreateResumeV1Response": {
+      "type": "object",
+      "properties": {
+        "ResumeId": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "apiDescribeResumeV1Response": {
+      "type": "object",
+      "properties": {
+        "resume": {
+          "$ref": "#/definitions/apiResume"
+        }
+      }
+    },
+    "apiListResumesV1Response": {
+      "type": "object",
+      "properties": {
+        "resumes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/apiResume"
+          }
+        }
+      }
+    },
+    "apiRemoveResumeV1Response": {
+      "type": "object",
+      "properties": {
+        "found": {
+          "type": "boolean"
+        }
+      }
+    },
+    "apiResume": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "DocumentId": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "runtimeError": {
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "string"
+        },
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}
