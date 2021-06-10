@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"net"
 
 	"github.com/rs/zerolog/log"
@@ -10,12 +11,8 @@ import (
 	desc "github.com/ozoncp/ocp-resume-api/pkg/ocp-resume-api"
 )
 
-const (
-	grpcPort = ":82"
-)
-
-func run() error {
-	listen, err := net.Listen("tcp", grpcPort)
+func run(portNum *string) error {
+	listen, err := net.Listen("tcp", ":"+*portNum)
 	if err != nil {
 		log.Printf("failed to listen: %v", err)
 	}
@@ -31,8 +28,9 @@ func run() error {
 }
 
 func main() {
-	err := run()
-	if err == nil {
+	portNum := flag.String("port", "82", "Define port number for service.")
+	flag.Parse()
+	if err := run(portNum); err == nil {
 		log.Fatal()
 	}
 }
