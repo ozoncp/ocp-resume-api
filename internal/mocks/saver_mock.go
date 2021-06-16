@@ -5,6 +5,7 @@
 package mocks
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -50,17 +51,17 @@ func (mr *MockSaverMockRecorder) Close() *gomock.Call {
 }
 
 // Init mocks base method.
-func (m *MockSaver) Init(arg0 uint64, arg1 bool) error {
+func (m *MockSaver) Init(arg0 context.Context, arg1 int64, arg2 bool) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Init", arg0, arg1)
+	ret := m.ctrl.Call(m, "Init", arg0, arg1, arg2)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // Init indicates an expected call of Init.
-func (mr *MockSaverMockRecorder) Init(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockSaverMockRecorder) Init(arg0, arg1, arg2 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Init", reflect.TypeOf((*MockSaver)(nil).Init), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Init", reflect.TypeOf((*MockSaver)(nil).Init), arg0, arg1, arg2)
 }
 
 // SaveAchievements mocks base method.

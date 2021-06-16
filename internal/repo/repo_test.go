@@ -1,6 +1,9 @@
 package repo_test
 
 import (
+	"context"
+
+	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -10,11 +13,12 @@ import (
 )
 
 var _ = Describe("Repo", func() {
-	r := repo.NewRepo(11)
+	r := repo.NewRepo(sqlx.DB{})
 	achsA := make([]achievement.Achievement, 10)
 	achsR := make([]resume.Resume, 10)
-	err := r.AddAchievements(achsA)
+	ctx := context.Background()
+	err := r.AddAchievements(ctx, achsA)
 	Expect(err).ShouldNot(BeNil())
-	err = r.AddResumes(achsR)
+	err = r.AddResumes(ctx, achsR)
 	Expect(err).ShouldNot(BeNil())
 })

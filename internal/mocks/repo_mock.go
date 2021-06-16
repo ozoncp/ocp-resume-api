@@ -5,6 +5,7 @@
 package mocks
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -36,29 +37,73 @@ func (m *MockRepo) EXPECT() *MockRepoMockRecorder {
 }
 
 // AddAchievements mocks base method.
-func (m *MockRepo) AddAchievements(arg0 []achievement.Achievement) error {
+func (m *MockRepo) AddAchievements(arg0 context.Context, arg1 []achievement.Achievement) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddAchievements", arg0)
+	ret := m.ctrl.Call(m, "AddAchievements", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // AddAchievements indicates an expected call of AddAchievements.
-func (mr *MockRepoMockRecorder) AddAchievements(arg0 interface{}) *gomock.Call {
+func (mr *MockRepoMockRecorder) AddAchievements(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddAchievements", reflect.TypeOf((*MockRepo)(nil).AddAchievements), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddAchievements", reflect.TypeOf((*MockRepo)(nil).AddAchievements), arg0, arg1)
 }
 
 // AddResumes mocks base method.
-func (m *MockRepo) AddResumes(arg0 []resume.Resume) error {
+func (m *MockRepo) AddResumes(arg0 context.Context, arg1 []resume.Resume) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "AddResumes", arg0)
+	ret := m.ctrl.Call(m, "AddResumes", arg0, arg1)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // AddResumes indicates an expected call of AddResumes.
-func (mr *MockRepoMockRecorder) AddResumes(arg0 interface{}) *gomock.Call {
+func (mr *MockRepoMockRecorder) AddResumes(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddResumes", reflect.TypeOf((*MockRepo)(nil).AddResumes), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddResumes", reflect.TypeOf((*MockRepo)(nil).AddResumes), arg0, arg1)
+}
+
+// GetResumeById mocks base method.
+func (m *MockRepo) GetResumeById(arg0 context.Context, arg1 uint) (*resume.Resume, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetResumeById", arg0, arg1)
+	ret0, _ := ret[0].(*resume.Resume)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetResumeById indicates an expected call of GetResumeById.
+func (mr *MockRepoMockRecorder) GetResumeById(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetResumeById", reflect.TypeOf((*MockRepo)(nil).GetResumeById), arg0, arg1)
+}
+
+// ListResumes mocks base method.
+func (m *MockRepo) ListResumes(arg0 context.Context, arg1, arg2 uint64) ([]resume.Resume, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListResumes", arg0, arg1, arg2)
+	ret0, _ := ret[0].([]resume.Resume)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListResumes indicates an expected call of ListResumes.
+func (mr *MockRepoMockRecorder) ListResumes(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListResumes", reflect.TypeOf((*MockRepo)(nil).ListResumes), arg0, arg1, arg2)
+}
+
+// RemoveResumeById mocks base method.
+func (m *MockRepo) RemoveResumeById(arg0 context.Context, arg1 uint) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RemoveResumeById", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RemoveResumeById indicates an expected call of RemoveResumeById.
+func (mr *MockRepoMockRecorder) RemoveResumeById(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveResumeById", reflect.TypeOf((*MockRepo)(nil).RemoveResumeById), arg0, arg1)
 }

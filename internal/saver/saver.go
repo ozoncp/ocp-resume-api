@@ -1,6 +1,7 @@
 package saver
 
 import (
+	"context"
 	"errors"
 	"sync"
 	"time"
@@ -14,7 +15,7 @@ import (
 type Saver interface {
 	SaveAchievements(achievements []achievement.Achievement) error
 	SaveResumes(resumes []resume.Resume) error
-	Init(timeout int64, smartOtherCapDel bool) error
+	Init(ctx context.Context, timeout int64, smartOtherCapDel bool) error
 	Close() error
 }
 
@@ -48,7 +49,7 @@ func NewSaver(flusher flusher.Flusher, achievementsCap int, resumesCap int) Save
 	}
 }
 
-func (s *saver) Init(timeout int64, smartOtherCapDel bool) error {
+func (s *saver) Init(ctx context.Context, timeout int64, smartOtherCapDel bool) error {
 	if timeout <= 0 {
 		return errors.New("bad timeout. Must be > 0")
 	}
@@ -63,8 +64,8 @@ func (s *saver) Init(timeout int64, smartOtherCapDel bool) error {
 			case <-s.closeChannel:
 				isClosed = true
 			}
-			s.FlushAchievements()
-			s.FlushResumes()
+			s.FlushAchievements(ctx)
+			s.FlushResumes(ctx)
 			if isClosed {
 				s.channelClosed <- struct{}{}
 				return
@@ -74,27 +75,27 @@ func (s *saver) Init(timeout int64, smartOtherCapDel bool) error {
 	return nil
 }
 
-func (s *saver) FlushAchievements() {
+func (s *saver) FlushAchievements(ctx context.Context) {
 	s.mutexAchievements.Lock()
 	defer s.mutexAchievements.Unlock()
-	arrAchievements, err := s.flusher.FlushAchievements(s.achievements)
+	arrAchievements, err := s.flusher.FlushAchievements(ctx, s.achievements)
 	for tryCount := int(3); tryCount > 0; tryCount-- {
 		if err == nil && len(arrAchievements) == 0 {
 			break
 		}
-		arrAchievements, err = s.flusher.FlushAchievements(arrAchievements)
+		arrAchievements, err = s.flusher.FlushAchievements(ctx, arrAchievements)
 	}
 }
 
-func (s *saver) FlushResumes() {
+func (s *saver) FlushResumes(ctx context.Context) {
 	s.mutexResumes.Lock()
 	defer s.mutexResumes.Unlock()
-	arrResumes, err := s.flusher.FlushResumes(s.resumes)
+	arrResumes, err := s.flusher.FlushResumes(ctx, s.resumes)
 	for tryCount := int(3); tryCount > 0; tryCount-- {
 		if err == nil && len(arrResumes) == 0 {
 			break
 		}
-		arrResumes, err = s.flusher.FlushResumes(arrResumes)
+		arrResumes, err = s.flusher.FlushResumes(ctx, arrResumes)
 	}
 }
 

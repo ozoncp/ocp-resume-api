@@ -1,6 +1,7 @@
 package saver_test
 
 import (
+	"context"
 	"errors"
 	"time"
 
@@ -26,6 +27,7 @@ var _ = Describe("Saver", func() {
 		timeout         int64
 		waitTime        time.Duration
 		smartDel        bool
+		ctx             context.Context
 	)
 
 	BeforeEach(func() {
@@ -36,6 +38,7 @@ var _ = Describe("Saver", func() {
 		resumesCap = 128
 		achievements = make([]achievement.Achievement, 256)
 		resumes = make([]resume.Resume, 32)
+		ctx = context.Background()
 	})
 
 	AfterEach(func() {
@@ -46,7 +49,7 @@ var _ = Describe("Saver", func() {
 		//Expect(err).Should(BeNil())
 		timeout = -1
 		s = saver.NewSaver(mockFlusher, achievementsCap, resumesCap)
-		err = s.Init(timeout, smartDel)
+		err = s.Init(ctx, timeout, smartDel)
 		Expect(err).ShouldNot(BeNil())
 	})
 
@@ -54,12 +57,12 @@ var _ = Describe("Saver", func() {
 		BeforeEach(func() {
 			timeout = 1000 * int64(time.Millisecond)
 			waitTime = 2 * time.Millisecond
-			mockFlusher.EXPECT().FlushAchievements(gomock.Any()).Return([]achievement.Achievement{}, nil).Times(1)
-			mockFlusher.EXPECT().FlushResumes(gomock.Any()).Return([]resume.Resume{}, nil).Times(1)
+			mockFlusher.EXPECT().FlushAchievements(ctx, gomock.Any()).Return([]achievement.Achievement{}, nil).Times(1)
+			mockFlusher.EXPECT().FlushResumes(ctx, gomock.Any()).Return([]resume.Resume{}, nil).Times(1)
 		})
 		It("flusher takes 1 Call", func() {
 			s = saver.NewSaver(mockFlusher, achievementsCap, resumesCap)
-			err = s.Init(timeout, smartDel)
+			err = s.Init(ctx, timeout, smartDel)
 			Expect(err).Should(BeNil())
 			err = s.SaveAchievements(achievements)
 			Expect(err).Should(BeNil())
@@ -74,12 +77,12 @@ var _ = Describe("Saver", func() {
 		BeforeEach(func() {
 			timeout = 100 * int64(time.Millisecond)
 			waitTime = 350 * time.Millisecond
-			mockFlusher.EXPECT().FlushAchievements(gomock.Any()).Return([]achievement.Achievement{}, nil).Times(4)
-			mockFlusher.EXPECT().FlushResumes(gomock.Any()).Return([]resume.Resume{}, nil).Times(4)
+			mockFlusher.EXPECT().FlushAchievements(ctx, gomock.Any()).Return([]achievement.Achievement{}, nil).Times(4)
+			mockFlusher.EXPECT().FlushResumes(ctx, gomock.Any()).Return([]resume.Resume{}, nil).Times(4)
 		})
 		It("flusher takes 4 Call", func() {
 			s = saver.NewSaver(mockFlusher, achievementsCap, resumesCap)
-			err = s.Init(timeout, smartDel)
+			err = s.Init(ctx, timeout, smartDel)
 			Expect(err).Should(BeNil())
 			err = s.SaveAchievements(achievements)
 			Expect(err).Should(BeNil())
@@ -94,14 +97,14 @@ var _ = Describe("Saver", func() {
 		BeforeEach(func() {
 			timeout = 100 * int64(time.Millisecond)
 			waitTime = 350 * time.Millisecond
-			mockFlusher.EXPECT().FlushAchievements(achievements).Return(achievements, errors.New("error")).Times(3)
-			mockFlusher.EXPECT().FlushAchievements(gomock.Any()).Return([]achievement.Achievement{}, nil).Times(4)
-			mockFlusher.EXPECT().FlushResumes(resumes).Return(resumes, errors.New("error")).Times(3)
-			mockFlusher.EXPECT().FlushResumes(gomock.Any()).Return([]resume.Resume{}, nil).Times(4)
+			mockFlusher.EXPECT().FlushAchievements(ctx, achievements).Return(achievements, errors.New("error")).Times(3)
+			mockFlusher.EXPECT().FlushAchievements(ctx, gomock.Any()).Return([]achievement.Achievement{}, nil).Times(4)
+			mockFlusher.EXPECT().FlushResumes(ctx, resumes).Return(resumes, errors.New("error")).Times(3)
+			mockFlusher.EXPECT().FlushResumes(ctx, gomock.Any()).Return([]resume.Resume{}, nil).Times(4)
 		})
 		It("flusher takes 4 Call", func() {
 			s = saver.NewSaver(mockFlusher, achievementsCap, resumesCap)
-			err = s.Init(timeout, smartDel)
+			err = s.Init(ctx, timeout, smartDel)
 			Expect(err).Should(BeNil())
 			err = s.SaveAchievements(achievements)
 			Expect(err).Should(BeNil())
