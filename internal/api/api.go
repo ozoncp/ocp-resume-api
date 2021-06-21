@@ -14,8 +14,7 @@ import (
 )
 
 const (
-	errResumeNotFound = "resume not found"
-	errSql            = "sql error"
+	errSql = "sql error"
 )
 
 type api struct {
