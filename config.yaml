@@ -1,0 +1,21 @@
+grpc:
+  address: ":82"
+
+database :
+  port : "5432"
+  user : "postgres"
+  password : "postgres"
+  database : "postgres"
+  batch_size : 32
+
+metrics :
+  address : ":9100"
+  pattern : "/metrics"
+
+kafka:
+  events_queue_capacity: 100
+  topic : "resumes"
+  key : "key"
+  partition : 0
+  brokers: 
+  - ":9092"

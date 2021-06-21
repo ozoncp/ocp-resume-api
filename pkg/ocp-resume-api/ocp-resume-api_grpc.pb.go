@@ -18,9 +18,17 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type OcpResumeApiClient interface {
+	// Создает новую сущность resume и возвращает её идентификатор
 	CreateResumeV1(ctx context.Context, in *CreateResumeV1Request, opts ...grpc.CallOption) (*CreateResumeV1Response, error)
+	// Создает новые сущности resume и возвращает список добавленных идентификаторов
+	MultiCreateResumesV1(ctx context.Context, in *MultiCreateResumesV1Request, opts ...grpc.CallOption) (*MultiCreateResumesV1Response, error)
+	// Обновляет поля сущность resume для указанного ResumeId
+	UpdateResumeV1(ctx context.Context, in *UpdateResumeV1Request, opts ...grpc.CallOption) (*UpdateResumeV1Response, error)
+	// Возвращает описание сущности resume по указанному ResumeId
 	DescribeResumeV1(ctx context.Context, in *DescribeResumeV1Request, opts ...grpc.CallOption) (*DescribeResumeV1Response, error)
+	// Возвращает список сущностей resume (от offset - до limit-1)
 	ListResumeV1(ctx context.Context, in *ListResumesV1Request, opts ...grpc.CallOption) (*ListResumesV1Response, error)
+	// Удаляет сущность resume по указанному ResumeId
 	RemoveResumeV1(ctx context.Context, in *RemoveResumeV1Request, opts ...grpc.CallOption) (*RemoveResumeV1Response, error)
 }
 
@@ -35,6 +43,24 @@ func NewOcpResumeApiClient(cc grpc.ClientConnInterface) OcpResumeApiClient {
 func (c *ocpResumeApiClient) CreateResumeV1(ctx context.Context, in *CreateResumeV1Request, opts ...grpc.CallOption) (*CreateResumeV1Response, error) {
 	out := new(CreateResumeV1Response)
 	err := c.cc.Invoke(ctx, "/ocp.resume.api.OcpResumeApi/CreateResumeV1", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *ocpResumeApiClient) MultiCreateResumesV1(ctx context.Context, in *MultiCreateResumesV1Request, opts ...grpc.CallOption) (*MultiCreateResumesV1Response, error) {
+	out := new(MultiCreateResumesV1Response)
+	err := c.cc.Invoke(ctx, "/ocp.resume.api.OcpResumeApi/MultiCreateResumesV1", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *ocpResumeApiClient) UpdateResumeV1(ctx context.Context, in *UpdateResumeV1Request, opts ...grpc.CallOption) (*UpdateResumeV1Response, error) {
+	out := new(UpdateResumeV1Response)
+	err := c.cc.Invoke(ctx, "/ocp.resume.api.OcpResumeApi/UpdateResumeV1", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -72,9 +98,17 @@ func (c *ocpResumeApiClient) RemoveResumeV1(ctx context.Context, in *RemoveResum
 // All implementations must embed UnimplementedOcpResumeApiServer
 // for forward compatibility
 type OcpResumeApiServer interface {
+	// Создает новую сущность resume и возвращает её идентификатор
 	CreateResumeV1(context.Context, *CreateResumeV1Request) (*CreateResumeV1Response, error)
+	// Создает новые сущности resume и возвращает список добавленных идентификаторов
+	MultiCreateResumesV1(context.Context, *MultiCreateResumesV1Request) (*MultiCreateResumesV1Response, error)
+	// Обновляет поля сущность resume для указанного ResumeId
+	UpdateResumeV1(context.Context, *UpdateResumeV1Request) (*UpdateResumeV1Response, error)
+	// Возвращает описание сущности resume по указанному ResumeId
 	DescribeResumeV1(context.Context, *DescribeResumeV1Request) (*DescribeResumeV1Response, error)
+	// Возвращает список сущностей resume (от offset - до limit-1)
 	ListResumeV1(context.Context, *ListResumesV1Request) (*ListResumesV1Response, error)
+	// Удаляет сущность resume по указанному ResumeId
 	RemoveResumeV1(context.Context, *RemoveResumeV1Request) (*RemoveResumeV1Response, error)
 	mustEmbedUnimplementedOcpResumeApiServer()
 }
@@ -85,6 +119,12 @@ type UnimplementedOcpResumeApiServer struct {
 
 func (UnimplementedOcpResumeApiServer) CreateResumeV1(context.Context, *CreateResumeV1Request) (*CreateResumeV1Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateResumeV1 not implemented")
+}
+func (UnimplementedOcpResumeApiServer) MultiCreateResumesV1(context.Context, *MultiCreateResumesV1Request) (*MultiCreateResumesV1Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MultiCreateResumesV1 not implemented")
+}
+func (UnimplementedOcpResumeApiServer) UpdateResumeV1(context.Context, *UpdateResumeV1Request) (*UpdateResumeV1Response, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateResumeV1 not implemented")
 }
 func (UnimplementedOcpResumeApiServer) DescribeResumeV1(context.Context, *DescribeResumeV1Request) (*DescribeResumeV1Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DescribeResumeV1 not implemented")
@@ -122,6 +162,42 @@ func _OcpResumeApi_CreateResumeV1_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(OcpResumeApiServer).CreateResumeV1(ctx, req.(*CreateResumeV1Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OcpResumeApi_MultiCreateResumesV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MultiCreateResumesV1Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OcpResumeApiServer).MultiCreateResumesV1(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ocp.resume.api.OcpResumeApi/MultiCreateResumesV1",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OcpResumeApiServer).MultiCreateResumesV1(ctx, req.(*MultiCreateResumesV1Request))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _OcpResumeApi_UpdateResumeV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateResumeV1Request)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OcpResumeApiServer).UpdateResumeV1(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ocp.resume.api.OcpResumeApi/UpdateResumeV1",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OcpResumeApiServer).UpdateResumeV1(ctx, req.(*UpdateResumeV1Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -190,6 +266,14 @@ var OcpResumeApi_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateResumeV1",
 			Handler:    _OcpResumeApi_CreateResumeV1_Handler,
+		},
+		{
+			MethodName: "MultiCreateResumesV1",
+			Handler:    _OcpResumeApi_MultiCreateResumesV1_Handler,
+		},
+		{
+			MethodName: "UpdateResumeV1",
+			Handler:    _OcpResumeApi_UpdateResumeV1_Handler,
 		},
 		{
 			MethodName: "DescribeResumeV1",

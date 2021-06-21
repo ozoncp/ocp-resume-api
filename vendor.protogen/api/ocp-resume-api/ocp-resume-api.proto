@@ -1,19 +1,37 @@
 syntax = "proto3";
 
 import "google/api/annotations.proto";
-import "github.com/envoyproxy/protoc-gen-validate/validate/validate.proto";
 option go_package = "github.com/ozoncp/ocp-resume-api/pkg/ocp-resume-api;ocp_resume_api";
 
 package ocp.resume.api;
 
 service OcpResumeApi {
+    // Создает новую сущность resume и возвращает её идентификатор
     rpc CreateResumeV1(CreateResumeV1Request) returns (CreateResumeV1Response) {
         option (google.api.http) = {
             post: "/v1/resumes"
+            body: "*"
         };
     
     }
 
+    // Создает новые сущности resume и возвращает список добавленных идентификаторов
+    rpc MultiCreateResumesV1(MultiCreateResumesV1Request) returns (MultiCreateResumesV1Response){
+        option (google.api.http) = {
+            post: "/v1/resumes_multi"
+            body: "*"
+        };
+    }
+
+    // Обновляет поля сущность resume для указанного ResumeId
+    rpc UpdateResumeV1(UpdateResumeV1Request) returns (UpdateResumeV1Response){
+        option (google.api.http) = {
+            put: "/v1/resumes/{ResumeId}"
+            body: "*"
+        };
+    }
+
+    // Возвращает описание сущности resume по указанному ResumeId
     rpc DescribeResumeV1(DescribeResumeV1Request) returns (DescribeResumeV1Response) {
         option (google.api.http) = {
             get: "/v1/resumes/{ResumeId}"
@@ -21,21 +39,37 @@ service OcpResumeApi {
     
     }
 
+    // Возвращает список сущностей resume (от offset - до limit-1)
     rpc ListResumeV1(ListResumesV1Request) returns (ListResumesV1Response) {
         option (google.api.http) = {
             get: "/v1/resumes"
         };
-    
+
     }
 
+    // Удаляет сущность resume по указанному ResumeId
     rpc RemoveResumeV1(RemoveResumeV1Request) returns (RemoveResumeV1Response) {
         option (google.api.http) = {
-            post: "/v1/resumes/{ResumeId}"
+            delete: "/v1/resumes/{ResumeId}"
         };
     
     }
 }
 
+
+message MultiCreateResumesV1Request {
+    repeated Resume resumes = 1;
+}
+message MultiCreateResumesV1Response {
+    repeated uint64 ResumeIds = 1;
+}
+message UpdateResumeV1Request {
+    uint64 ResumeId = 1;
+    Resume resume = 2;
+}
+message UpdateResumeV1Response {
+    bool found = 1;
+}
 message CreateResumeV1Request {
     uint64 DocumentId = 2;
 }
@@ -43,7 +77,7 @@ message CreateResumeV1Response {
     uint64 ResumeId = 1;
 }
 message DescribeResumeV1Request {
-    uint64 ResumeId = 1 [(validate.rules).uint64.gt = 0];
+    uint64 ResumeId = 1;
 }
 message DescribeResumeV1Response {
     Resume resume = 1;
@@ -56,7 +90,7 @@ message ListResumesV1Response {
     repeated Resume resumes = 1;
 }
 message RemoveResumeV1Request {
-    uint64 ResumeId = 1 [(validate.rules).uint64.gt = 0];
+    uint64 ResumeId = 1;
 }
 message RemoveResumeV1Response {
     bool found = 1;
