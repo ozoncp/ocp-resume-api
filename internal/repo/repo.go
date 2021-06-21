@@ -34,10 +34,10 @@ type RepoAchievement interface {
 }
 
 type repo struct {
-	base sqlx.DB
+	base *sqlx.DB
 }
 
-func NewRepo(db sqlx.DB) Repo {
+func NewRepo(db *sqlx.DB) Repo {
 	return &repo{
 		base: db,
 	}

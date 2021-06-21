@@ -1,4 +1,4 @@
-package repo_test
+package api_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestRepo(t *testing.T) {
+func TestApi(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Repo Suite")
+	RunSpecs(t, "Api Suite")
 }
