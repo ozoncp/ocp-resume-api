@@ -1,6 +1,7 @@
 package flusher_test
 
 import (
+	"context"
 	"errors"
 
 	"github.com/golang/mock/gomock"
@@ -26,16 +27,18 @@ var _ = Describe("Flusher", func() {
 		retResumes      []resume.Resume
 		achBsize        uint64
 		resumeBsize     uint64
+		ctx             context.Context
 	)
 
 	BeforeEach(func() {
 		ctrl = gomock.NewController(GinkgoT())
+		ctx = context.Background()
 		mockRepo = mocks.NewMockRepo(ctrl)
 	})
 
 	JustBeforeEach(func() {
-		retAchievements, err1 = f.FlushAchievements(achievements)
-		retResumes, err2 = f.FlushResumes(resumes)
+		retAchievements, err1 = f.FlushAchievements(ctx, achievements)
+		retResumes, err2 = f.FlushResumes(ctx, resumes)
 	})
 
 	AfterEach(func() {
@@ -48,8 +51,8 @@ var _ = Describe("Flusher", func() {
 				achievements = []achievement.Achievement{}
 				achBsize = 32
 				f = flusher.NewFlushAchievementsOnly(mockRepo, achBsize)
-				mockRepo.EXPECT().AddAchievements(achievements).Return(nil).Times(0)
-				mockRepo.EXPECT().AddResumes(resumes).Return(nil).Times(0)
+				mockRepo.EXPECT().AddAchievements(ctx, achievements).Return(nil).Times(0)
+				mockRepo.EXPECT().AddResumes(ctx, resumes).Return(nil).Times(0)
 			})
 			It("return empty array and no error for achievements flush and error for resume flush", func() {
 				//Expect(err).Should(BeNil())
@@ -65,8 +68,8 @@ var _ = Describe("Flusher", func() {
 				achievements = make([]achievement.Achievement, 2)
 				resumes = make([]resume.Resume, 3)
 				f = flusher.NewFlushAchievementsOnly(mockRepo, achBsize)
-				mockRepo.EXPECT().AddAchievements(achievements).Return(nil).Times(1)
-				mockRepo.EXPECT().AddResumes(resumes).Return(errors.New("Resume not created")).Times(0)
+				mockRepo.EXPECT().AddAchievements(ctx, achievements).Return(nil).Times(1)
+				mockRepo.EXPECT().AddResumes(ctx, resumes).Return(errors.New("Resume not created")).Times(0)
 			})
 			It("return empty array and no error for achievements flush and input array and error for resume flush", func() {
 				//Expect(err).Should(BeNil())
@@ -85,8 +88,8 @@ var _ = Describe("Flusher", func() {
 				resumes = []resume.Resume{}
 				resumeBsize = 32
 				f = flusher.NewFlusherResumeOnly(mockRepo, resumeBsize)
-				mockRepo.EXPECT().AddAchievements(achievements).Return(nil).Times(0)
-				mockRepo.EXPECT().AddResumes(resumes).Return(nil).Times(0)
+				mockRepo.EXPECT().AddAchievements(ctx, achievements).Return(nil).Times(0)
+				mockRepo.EXPECT().AddResumes(ctx, resumes).Return(nil).Times(0)
 			})
 			It("return empty array and no error for resume flush and error for achievement flush", func() {
 				//Expect(err).Should(BeNil())
@@ -102,8 +105,8 @@ var _ = Describe("Flusher", func() {
 				achievements = make([]achievement.Achievement, 2)
 				resumes = make([]resume.Resume, 3)
 				f = flusher.NewFlusherResumeOnly(mockRepo, resumeBsize)
-				mockRepo.EXPECT().AddAchievements(achievements).Return(errors.New("Achievements not created")).Times(0)
-				mockRepo.EXPECT().AddResumes(resumes).Return(nil).Times(1)
+				mockRepo.EXPECT().AddAchievements(ctx, achievements).Return(errors.New("Achievements not created")).Times(0)
+				mockRepo.EXPECT().AddResumes(ctx, resumes).Return(nil).Times(1)
 			})
 			It("return empty array and no error for resumes flush and input array and error for achievements flush", func() {
 				//Expect(err).Should(BeNil())
@@ -123,8 +126,8 @@ var _ = Describe("Flusher", func() {
 				resumeBsize = 16
 				achBsize = 32
 				f = flusher.NewFlusher(mockRepo, resumeBsize, achBsize)
-				mockRepo.EXPECT().AddAchievements(achievements).Return(nil).Times(0)
-				mockRepo.EXPECT().AddResumes(resumes).Return(nil).Times(0)
+				mockRepo.EXPECT().AddAchievements(ctx, achievements).Return(nil).Times(0)
+				mockRepo.EXPECT().AddResumes(ctx, resumes).Return(nil).Times(0)
 			})
 			It("return empty array and no error for achievements and resumes", func() {
 				//Expect(err).Should(BeNil())
@@ -141,8 +144,8 @@ var _ = Describe("Flusher", func() {
 				achievements = make([]achievement.Achievement, 2)
 				resumes = make([]resume.Resume, 3)
 				f = flusher.NewFlusher(mockRepo, resumeBsize, achBsize)
-				mockRepo.EXPECT().AddAchievements(achievements).Return(nil).Times(1)
-				mockRepo.EXPECT().AddResumes(resumes).Return(nil).Times(1)
+				mockRepo.EXPECT().AddAchievements(ctx, achievements).Return(nil).Times(1)
+				mockRepo.EXPECT().AddResumes(ctx, resumes).Return(nil).Times(1)
 			})
 			It("return empty array and no error for achievements and resumes (functions add calls ones)", func() {
 				//Expect(err).Should(BeNil())
@@ -159,8 +162,8 @@ var _ = Describe("Flusher", func() {
 				achievements = make([]achievement.Achievement, 8)
 				resumes = make([]resume.Resume, 7)
 				f = flusher.NewFlusher(mockRepo, resumeBsize, achBsize)
-				mockRepo.EXPECT().AddAchievements(gomock.Any()).Return(nil).Times(2)
-				mockRepo.EXPECT().AddResumes(gomock.Any()).Return(nil).Times(2)
+				mockRepo.EXPECT().AddAchievements(ctx, gomock.Any()).Return(nil).Times(2)
+				mockRepo.EXPECT().AddResumes(ctx, gomock.Any()).Return(nil).Times(2)
 			})
 			It("return empty array and no error for achievements and resumes (functions add calls twice)", func() {
 				//Expect(err).Should(BeNil())
@@ -177,9 +180,9 @@ var _ = Describe("Flusher", func() {
 				achievements = make([]achievement.Achievement, 16)
 				resumes = make([]resume.Resume, 9)
 				f = flusher.NewFlusher(mockRepo, resumeBsize, achBsize)
-				mockRepo.EXPECT().AddAchievements(gomock.Any()).Return(nil).Times(2)
-				mockRepo.EXPECT().AddAchievements(gomock.Any()).Return(errors.New("error")).Times(2)
-				mockRepo.EXPECT().AddResumes(gomock.Any()).Return(errors.New("error")).Times(3)
+				mockRepo.EXPECT().AddAchievements(ctx, gomock.Any()).Return(nil).Times(2)
+				mockRepo.EXPECT().AddAchievements(ctx, gomock.Any()).Return(errors.New("error")).Times(2)
+				mockRepo.EXPECT().AddResumes(ctx, gomock.Any()).Return(errors.New("error")).Times(3)
 			})
 			It("return not empty arrays and no error for achievements and resumes (in case with resumes returned array like input)", func() {
 				//Expect(err).Should(BeNil())

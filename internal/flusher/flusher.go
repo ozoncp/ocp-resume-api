@@ -1,6 +1,7 @@
 package flusher
 
 import (
+	"context"
 	"errors"
 
 	"github.com/ozoncp/ocp-resume-api/internal/achievement"
@@ -10,11 +11,11 @@ import (
 )
 
 type FlusherResume interface {
-	FlushResumes(r []resume.Resume) ([]resume.Resume, error)
+	FlushResumes(ctx context.Context, r []resume.Resume) ([]resume.Resume, error)
 }
 
 type FlusherAchievement interface {
-	FlushAchievements(a []achievement.Achievement) ([]achievement.Achievement, error)
+	FlushAchievements(ctx context.Context, a []achievement.Achievement) ([]achievement.Achievement, error)
 }
 
 type Flusher interface {
@@ -56,14 +57,14 @@ func NewFlushAchievementsOnly(achievementRepo repo.Repo, achievementsBatchSize u
 	}
 }
 
-func (f *flusher) FlushResumes(r []resume.Resume) ([]resume.Resume, error) {
+func (f *flusher) FlushResumes(ctx context.Context, r []resume.Resume) ([]resume.Resume, error) {
 	batches, ok := utils.SplitResumesToBatches(r, int(f.resumesBatchSize), false)
 	if !ok {
 		return r, errors.New("can't split resumes to batches")
 	}
 	retArr := make([]resume.Resume, 0, len(r))
 	for _, batch := range batches {
-		err := f.repoResume.AddResumes(batch)
+		err := f.repoResume.AddResumes(ctx, batch)
 		if err != nil {
 			retArr = append(retArr, batch...)
 		}
@@ -71,14 +72,14 @@ func (f *flusher) FlushResumes(r []resume.Resume) ([]resume.Resume, error) {
 	return retArr, nil
 }
 
-func (f *flusher) FlushAchievements(r []achievement.Achievement) ([]achievement.Achievement, error) {
+func (f *flusher) FlushAchievements(ctx context.Context, r []achievement.Achievement) ([]achievement.Achievement, error) {
 	batches, ok := utils.SplitAchievementsToBatches(r, int(f.achievementsBatchSize), false)
 	if !ok {
 		return r, errors.New("can't split achievements to batches")
 	}
 	retArr := make([]achievement.Achievement, 0, len(r))
 	for _, batch := range batches {
-		err := f.repoAchievement.AddAchievements(batch)
+		err := f.repoAchievement.AddAchievements(ctx, batch)
 		if err != nil {
 			retArr = append(retArr, batch...)
 		}

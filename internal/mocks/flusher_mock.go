@@ -5,6 +5,7 @@
 package mocks
 
 import (
+	context "context"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
@@ -36,31 +37,31 @@ func (m *MockFlusher) EXPECT() *MockFlusherMockRecorder {
 }
 
 // FlushAchievements mocks base method.
-func (m *MockFlusher) FlushAchievements(arg0 []achievement.Achievement) ([]achievement.Achievement, error) {
+func (m *MockFlusher) FlushAchievements(arg0 context.Context, arg1 []achievement.Achievement) ([]achievement.Achievement, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FlushAchievements", arg0)
+	ret := m.ctrl.Call(m, "FlushAchievements", arg0, arg1)
 	ret0, _ := ret[0].([]achievement.Achievement)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FlushAchievements indicates an expected call of FlushAchievements.
-func (mr *MockFlusherMockRecorder) FlushAchievements(arg0 interface{}) *gomock.Call {
+func (mr *MockFlusherMockRecorder) FlushAchievements(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FlushAchievements", reflect.TypeOf((*MockFlusher)(nil).FlushAchievements), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FlushAchievements", reflect.TypeOf((*MockFlusher)(nil).FlushAchievements), arg0, arg1)
 }
 
 // FlushResumes mocks base method.
-func (m *MockFlusher) FlushResumes(arg0 []resume.Resume) ([]resume.Resume, error) {
+func (m *MockFlusher) FlushResumes(arg0 context.Context, arg1 []resume.Resume) ([]resume.Resume, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "FlushResumes", arg0)
+	ret := m.ctrl.Call(m, "FlushResumes", arg0, arg1)
 	ret0, _ := ret[0].([]resume.Resume)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // FlushResumes indicates an expected call of FlushResumes.
-func (mr *MockFlusherMockRecorder) FlushResumes(arg0 interface{}) *gomock.Call {
+func (mr *MockFlusherMockRecorder) FlushResumes(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FlushResumes", reflect.TypeOf((*MockFlusher)(nil).FlushResumes), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FlushResumes", reflect.TypeOf((*MockFlusher)(nil).FlushResumes), arg0, arg1)
 }
