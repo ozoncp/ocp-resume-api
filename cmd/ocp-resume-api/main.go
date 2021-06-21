@@ -41,7 +41,7 @@ func run(grpcPort *string,
 		log.Error().Err(err).Msg("failed to ping database")
 		return err
 	}
-	repo := repo.NewRepo(*db)
+	repo := repo.NewRepo(db)
 
 	if err != nil {
 		log.Printf("failed to listen: %v", err)
