@@ -76,7 +76,7 @@ func (r *repo) UpdateResumeById(ctx context.Context, resumeId uint, newData resu
 }
 
 func (r *repo) AddResumes(ctx context.Context, resumeArr []resume.Resume) ([]uint64, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, fmt.Sprintf("Add %v resumes", len(resumeArr)))
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Add resumes")
 	span.LogFields(log.Int("resume.count", len(resumeArr)))
 	defer span.Finish()
 	batches, err := utils.SplitResumesToBatches(resumeArr, r.batchSize, false)
@@ -86,12 +86,18 @@ func (r *repo) AddResumes(ctx context.Context, resumeArr []resume.Resume) ([]uin
 	returnedIds := make([]uint64, 0)
 	returnErr := false
 	for _, batch := range batches {
-		batchIds, err := r.AddResumesBatch(ctx, batch)
-		if err != nil {
-			zlog.Err(err).Int("length", len(batch)).Msg("resumes batch was not added")
-			returnErr = true
-		}
-		returnedIds = append(returnedIds, batchIds...)
+		func(batch []resume.Resume) {
+			batchSpan, ctx := opentracing.StartSpanFromContext(ctx, "Add resumes in batch")
+			batchSpan.LogFields(log.Int("batch_len", len(resumeArr)))
+			defer batchSpan.Finish()
+			batchIds, err := r.AddResumesBatch(ctx, batch)
+			if err != nil {
+				zlog.Err(err).Int("length", len(batch)).Msg("resumes batch was not added")
+				batchSpan.LogFields(log.Error(err))
+				returnErr = true
+			}
+			returnedIds = append(returnedIds, batchIds...)
+		}(batch)
 	}
 	if returnErr {
 		return returnedIds, errors.New("some resumes was not added! wrong situation, which the programmers did not describe")
@@ -100,8 +106,6 @@ func (r *repo) AddResumes(ctx context.Context, resumeArr []resume.Resume) ([]uin
 }
 
 func (r *repo) AddResumesBatch(ctx context.Context, resumeArr []resume.Resume) ([]uint64, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, fmt.Sprintf("Add %v resumes in batch", len(resumeArr)))
-	defer span.Finish()
 	query := sq.Insert("resumes").Columns("document_id").Suffix(
 		"returning id").RunWith(r.base).PlaceholderFormat(sq.Dollar)
 	for _, resume := range resumeArr {
@@ -117,7 +121,7 @@ func (r *repo) AddResumesBatch(ctx context.Context, resumeArr []resume.Resume) (
 	for rows.Next() {
 		var resumeId uint64
 		if err := rows.Scan(&resumeId); err != nil {
-			zlog.Err(err).Msgf("Error while trying to list inserted resumes")
+			zlog.Err(err).Msg("Error while trying to list inserted resumes")
 			return inserted, err
 		}
 		inserted = append(inserted, resumeId)
@@ -129,10 +133,10 @@ func (r *repo) RemoveResumeById(ctx context.Context, resumeId uint) error {
 	query := sq.Delete("resumes").Where(sq.Eq{"id": resumeId}).RunWith(r.base).PlaceholderFormat(sq.Dollar)
 	_, err := query.ExecContext(ctx)
 	if err == nil {
-		zlog.Err(err).Msgf("Error while trying to remove resume with id %v", resumeId)
+		zlog.Err(err).Uint64("resumeId", uint64(resumeId)).Msg("Error while trying to remove resume")
 		return err
 	}
-	zlog.Info().Msgf("Resume with id %v removed", resumeId)
+	zlog.Info().Uint64("resumeId", uint64(resumeId)).Msg("Resume removed")
 	return nil
 }
 
@@ -142,10 +146,10 @@ func (r *repo) GetResumeById(ctx context.Context, resumeId uint) (*resume.Resume
 	err := query.QueryRowContext(ctx).Scan(&selected.Id, &selected.DocumentId)
 	switch {
 	case err == sql.ErrNoRows:
-		zlog.Err(err).Msgf("No resume with id %v", resumeId)
+		zlog.Err(err).Uint64("resumeId", uint64(resumeId)).Msg("No resume")
 		return nil, err
 	case err != nil:
-		zlog.Err(err).Msgf("Query error while trying to find resume with id %v", resumeId)
+		zlog.Err(err).Uint64("resumeId", uint64(resumeId)).Msg("Query error while trying to find resume")
 		return nil, err
 	}
 	return &selected, nil
@@ -155,7 +159,7 @@ func (r *repo) ListResumes(ctx context.Context, offset, limit uint64) ([]resume.
 	query := sq.Select("id", "document_id").From("resumes").Limit(limit).Offset(offset).RunWith(r.base).PlaceholderFormat(sq.Dollar)
 	rows, err := query.QueryContext(ctx)
 	if err != nil {
-		zlog.Err(err).Msgf("Error while trying to list resumes")
+		zlog.Err(err).Msg("Error while trying to list resumes")
 		return nil, err
 	}
 	defer rows.Close()
@@ -163,7 +167,7 @@ func (r *repo) ListResumes(ctx context.Context, offset, limit uint64) ([]resume.
 	for rows.Next() {
 		var resumeRow resume.Resume
 		if err := rows.Scan(&resumeRow.Id, &resumeRow.DocumentId); err != nil {
-			zlog.Err(err).Msgf("Error while trying to list resumes")
+			zlog.Err(err).Msg("Error while trying to list resumes")
 			return selected, err
 		}
 		selected = append(selected, resumeRow)

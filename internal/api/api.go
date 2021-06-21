@@ -68,8 +68,8 @@ func (a *api) UpdateResumeV1(
 	metrics.IncrementUpdateRequests(1)
 
 	err := a.repo.UpdateResumeById(ctx, uint(req.ResumeId), resume.Resume{
-		Id:         uint(req.Resume.Id),
-		DocumentId: uint(req.Resume.DocumentId),
+		Id:         uint(req.Resume.GetId()),
+		DocumentId: uint(req.Resume.GetDocumentId()),
 	})
 	if err != nil {
 		if errors.Is(err, &repo.ResumeNotFoundError{}) {
