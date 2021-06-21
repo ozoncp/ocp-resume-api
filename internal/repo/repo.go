@@ -47,6 +47,7 @@ func NewRepo(db *sqlx.DB) Repo {
 	}
 }
 
+
 func (r *repo) UpdateResumeById(ctx context.Context, resumeId uint, newData resume.Resume) error {
 	query := sq.Update("resumes").Where(sq.Eq{"id": resumeId}).SetMap(
 		map[string]interface{}{
@@ -61,8 +62,15 @@ func (r *repo) UpdateResumeById(ctx context.Context, resumeId uint, newData resu
 	if affected, err := result.RowsAffected(); err == nil && affected == 0 {
 		return errors.New("resume id not found")
 	}
+	_, err := query.ExecContext(ctx)
+	if err == nil {
+		log.Err(err).Msgf("Error while trying to add resume %v", resumeArr)
+		return err
+	}
+	log.Info().Msgf("%v resumes added", len(resumeArr))
 	return nil
 }
+
 
 func (r *repo) AddResumes(ctx context.Context, resumeArr []resume.Resume) ([]uint64, error) {
 	span, ctx := opentracing.StartSpanFromContext(ctx, fmt.Sprintf("Add %v resumes", len(resumeArr)))
