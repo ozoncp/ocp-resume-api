@@ -13,6 +13,7 @@
   "paths": {
     "/v1/resumes": {
       "get": {
+        "summary": "Возвращает список сущностей resume (от offset - до limit-1)",
         "operationId": "OcpResumeApi_ListResumeV1",
         "responses": {
           "200": {
@@ -49,6 +50,7 @@
         ]
       },
       "post": {
+        "summary": "Создает новую сущность resume и возвращает её идентификатор",
         "operationId": "OcpResumeApi_CreateResumeV1",
         "responses": {
           "200": {
@@ -71,6 +73,7 @@
     },
     "/v1/resumes/{ResumeId}": {
       "get": {
+        "summary": "Возвращает описание сущности resume по указанному ResumeId",
         "operationId": "OcpResumeApi_DescribeResumeV1",
         "responses": {
           "200": {
@@ -100,12 +103,68 @@
         ]
       },
       "post": {
+        "summary": "Удаляет сущность resume по указанному ResumeId",
         "operationId": "OcpResumeApi_RemoveResumeV1",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/apiRemoveResumeV1Response"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ResumeId",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "format": "uint64"
+          }
+        ],
+        "tags": [
+          "OcpResumeApi"
+        ]
+      }
+    },
+    "/v1/resumes_multi": {
+      "post": {
+        "summary": "Создает новые сущности resume и возвращает список добавленных идентификаторов",
+        "operationId": "OcpResumeApi_MultiCreateResumesV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiMultiCreateResumesV1Response"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "OcpResumeApi"
+        ]
+      }
+    },
+    "/v1/resumes_upd/{ResumeId}": {
+      "post": {
+        "summary": "Обновляет поля сущность resume для указанного ResumeId",
+        "operationId": "OcpResumeApi_UpdateResumeV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiUpdateResumeV1Response"
             }
           },
           "default": {
@@ -159,6 +218,18 @@
         }
       }
     },
+    "apiMultiCreateResumesV1Response": {
+      "type": "object",
+      "properties": {
+        "ResumeIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        }
+      }
+    },
     "apiRemoveResumeV1Response": {
       "type": "object",
       "properties": {
@@ -177,6 +248,14 @@
         "DocumentId": {
           "type": "string",
           "format": "uint64"
+        }
+      }
+    },
+    "apiUpdateResumeV1Response": {
+      "type": "object",
+      "properties": {
+        "found": {
+          "type": "boolean"
         }
       }
     },

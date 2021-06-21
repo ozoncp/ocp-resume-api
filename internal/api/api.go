@@ -22,13 +22,51 @@ type api struct {
 	repo repo.RepoResume
 }
 
+func (a *api) MultiCreateResumesV1(
+	ctx context.Context,
+	req *desc.MultiCreateResumesV1Request,
+) (*desc.MultiCreateResumesV1Response, error) {
+	resumeArr := make([]resume.Resume, 0)
+	for _, resumeInReq := range req.Resumes {
+		resumeArr = append(resumeArr, resume.Resume{
+			Id:         0,
+			DocumentId: uint(resumeInReq.DocumentId),
+		})
+	}
+	insertedIds, err := a.repo.AddResumes(ctx, resumeArr)
+	if err != nil {
+		log.Err(err).Msg(errSql)
+		return nil, status.Error(codes.DataLoss, errSql)
+	}
+	log.Info().Msgf("Created %v resumes", len(insertedIds))
+	return &desc.MultiCreateResumesV1Response{
+		ResumeIds: insertedIds,
+	}, nil
+}
+
+func (a *api) UpdateResumeV1(
+	ctx context.Context,
+	req *desc.UpdateResumeV1Request,
+) (*desc.UpdateResumeV1Response, error) {
+	err := a.repo.UpdateResumeById(ctx, uint(req.ResumeId), resume.Resume{
+		Id:         uint(req.Resume.Id),
+		DocumentId: uint(req.Resume.DocumentId),
+	})
+	if err != nil {
+		return &desc.UpdateResumeV1Response{
+			Found: false,
+		}, status.Error(codes.NotFound, errSql)
+	} else {
+		return &desc.UpdateResumeV1Response{
+			Found: true,
+		}, nil
+	}
+}
+
 func (a *api) DescribeResumeV1(
 	ctx context.Context,
 	req *desc.DescribeResumeV1Request,
 ) (*desc.DescribeResumeV1Response, error) {
-	if err := req.Validate(); err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
 	resume, err := a.repo.GetResumeById(ctx, uint(req.ResumeId))
 	if err != nil || resume == nil {
 		log.Err(err).Msg(errSql)
@@ -47,22 +85,19 @@ func (a *api) CreateResumeV1(
 	ctx context.Context,
 	req *desc.CreateResumeV1Request,
 ) (*desc.CreateResumeV1Response, error) {
-	if err := req.Validate(); err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
 	resumeArr := make([]resume.Resume, 0)
 	resumeArr = append(resumeArr, resume.Resume{
 		Id:         0,
 		DocumentId: uint(req.DocumentId),
 	})
-	err := a.repo.AddResumes(ctx, resumeArr)
+	insertedIds, err := a.repo.AddResumes(ctx, resumeArr)
 	if err != nil {
 		log.Err(err).Msg(errSql)
 		return nil, status.Error(codes.DataLoss, errSql)
 	}
 	log.Info().Msg("Resume created")
 	return &desc.CreateResumeV1Response{
-		ResumeId: 1,
+		ResumeId: uint64(insertedIds[0]),
 	}, nil
 }
 
@@ -70,9 +105,6 @@ func (a *api) RemoveResumeV1(
 	ctx context.Context,
 	req *desc.RemoveResumeV1Request,
 ) (*desc.RemoveResumeV1Response, error) {
-	if err := req.Validate(); err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
 	err := a.repo.RemoveResumeById(ctx, uint(req.ResumeId))
 	if err != nil {
 		log.Err(err).Msg(errSql)
@@ -88,9 +120,6 @@ func (a *api) ListResumesV1(
 	ctx context.Context,
 	req *desc.ListResumesV1Request,
 ) (*desc.ListResumesV1Response, error) {
-	if err := req.Validate(); err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
 	resumesArr, err := a.repo.ListResumes(ctx, req.Offset, req.Limit)
 	if err != nil {
 		log.Err(err).Msg(errSql)

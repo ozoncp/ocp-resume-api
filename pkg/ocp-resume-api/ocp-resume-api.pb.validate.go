@@ -15,7 +15,7 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/protobuf/types/known/anypb"
 )
 
 // ensure the imports are used
@@ -30,8 +30,307 @@ var (
 	_ = time.Duration(0)
 	_ = (*url.URL)(nil)
 	_ = (*mail.Address)(nil)
-	_ = ptypes.DynamicAny{}
+	_ = anypb.Any{}
 )
+
+// Validate checks the field values on MultiCreateResumesV1Request with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MultiCreateResumesV1Request) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetResumes() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return MultiCreateResumesV1RequestValidationError{
+					field:  fmt.Sprintf("Resumes[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// MultiCreateResumesV1RequestValidationError is the validation error returned
+// by MultiCreateResumesV1Request.Validate if the designated constraints
+// aren't met.
+type MultiCreateResumesV1RequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MultiCreateResumesV1RequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MultiCreateResumesV1RequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MultiCreateResumesV1RequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MultiCreateResumesV1RequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MultiCreateResumesV1RequestValidationError) ErrorName() string {
+	return "MultiCreateResumesV1RequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MultiCreateResumesV1RequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMultiCreateResumesV1Request.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MultiCreateResumesV1RequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MultiCreateResumesV1RequestValidationError{}
+
+// Validate checks the field values on MultiCreateResumesV1Response with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MultiCreateResumesV1Response) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// MultiCreateResumesV1ResponseValidationError is the validation error returned
+// by MultiCreateResumesV1Response.Validate if the designated constraints
+// aren't met.
+type MultiCreateResumesV1ResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MultiCreateResumesV1ResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MultiCreateResumesV1ResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MultiCreateResumesV1ResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MultiCreateResumesV1ResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MultiCreateResumesV1ResponseValidationError) ErrorName() string {
+	return "MultiCreateResumesV1ResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MultiCreateResumesV1ResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMultiCreateResumesV1Response.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MultiCreateResumesV1ResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MultiCreateResumesV1ResponseValidationError{}
+
+// Validate checks the field values on UpdateResumeV1Request with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpdateResumeV1Request) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for ResumeId
+
+	if v, ok := interface{}(m.GetResume()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return UpdateResumeV1RequestValidationError{
+				field:  "Resume",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
+	return nil
+}
+
+// UpdateResumeV1RequestValidationError is the validation error returned by
+// UpdateResumeV1Request.Validate if the designated constraints aren't met.
+type UpdateResumeV1RequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateResumeV1RequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateResumeV1RequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateResumeV1RequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateResumeV1RequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateResumeV1RequestValidationError) ErrorName() string {
+	return "UpdateResumeV1RequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateResumeV1RequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateResumeV1Request.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateResumeV1RequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateResumeV1RequestValidationError{}
+
+// Validate checks the field values on UpdateResumeV1Response with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *UpdateResumeV1Response) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for Found
+
+	return nil
+}
+
+// UpdateResumeV1ResponseValidationError is the validation error returned by
+// UpdateResumeV1Response.Validate if the designated constraints aren't met.
+type UpdateResumeV1ResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e UpdateResumeV1ResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e UpdateResumeV1ResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e UpdateResumeV1ResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e UpdateResumeV1ResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e UpdateResumeV1ResponseValidationError) ErrorName() string {
+	return "UpdateResumeV1ResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e UpdateResumeV1ResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sUpdateResumeV1Response.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = UpdateResumeV1ResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = UpdateResumeV1ResponseValidationError{}
 
 // Validate checks the field values on CreateResumeV1Request with the rules
 // defined in the proto definition for this message. If any rules are

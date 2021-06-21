@@ -3,12 +3,15 @@ package repo
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/jmoiron/sqlx"
+	"github.com/opentracing/opentracing-go"
 	"github.com/ozoncp/ocp-resume-api/internal/achievement"
 	"github.com/ozoncp/ocp-resume-api/internal/resume"
+	"github.com/ozoncp/ocp-resume-api/internal/utils"
 	"github.com/rs/zerolog/log"
 )
 
@@ -18,10 +21,11 @@ type Repo interface {
 }
 
 type RepoResume interface {
-	AddResumes(ctx context.Context, r []resume.Resume) error
+	AddResumes(ctx context.Context, r []resume.Resume) ([]uint64, error)
 	RemoveResumeById(ctx context.Context, resumeId uint) error
 	GetResumeById(ctx context.Context, resumeId uint) (*resume.Resume, error)
 	ListResumes(ctx context.Context, offset, limit uint64) ([]resume.Resume, error)
+	UpdateResumeById(ctx context.Context, resumeId uint, newData resume.Resume) error
 }
 
 type RepoAchievement interface {
@@ -43,18 +47,68 @@ func NewRepo(db *sqlx.DB) Repo {
 	}
 }
 
-func (r *repo) AddResumes(ctx context.Context, resumeArr []resume.Resume) error {
-	query := sq.Insert("resumes").Columns("document_id").RunWith(r.base).PlaceholderFormat(sq.Dollar)
+func (r *repo) UpdateResumeById(ctx context.Context, resumeId uint, newData resume.Resume) error {
+	query := sq.Update("resumes").Where(sq.Eq{"id": resumeId}).SetMap(
+		map[string]interface{}{
+			"document_id": newData.DocumentId,
+			"id":          newData.Id,
+		},
+	).RunWith(r.base).PlaceholderFormat(sq.Dollar)
+	result, err := query.ExecContext(ctx)
+	if err != nil {
+		return err
+	}
+	if affected, err := result.RowsAffected(); err == nil && affected == 0 {
+		return errors.New("resume id not found")
+	}
+	return nil
+}
+
+func (r *repo) AddResumes(ctx context.Context, resumeArr []resume.Resume) ([]uint64, error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, fmt.Sprintf("Add %v resumes", len(resumeArr)))
+	defer span.Finish()
+	batches, err := utils.SplitResumesToBatches(resumeArr, 64, false)
+	if err {
+		return []uint64{}, errors.New("can't split for batches")
+	}
+	returnedIds := make([]uint64, 0)
+	returnErr := false
+	for _, batch := range batches {
+		batchIds, err := r.AddResumesBatch(ctx, batch)
+		if err != nil {
+			log.Err(err).Msgf("%v resumes was not added", len(batch))
+			returnErr = true
+		}
+		returnedIds = append(returnedIds, batchIds...)
+	}
+	if returnErr {
+		return returnedIds, errors.New("some resumes was not added! wrong situation, which the programmers did not describe")
+	}
+	return returnedIds, nil
+}
+
+func (r *repo) AddResumesBatch(ctx context.Context, resumeArr []resume.Resume) ([]uint64, error) {
+	query := sq.Insert("resumes").Columns("document_id").Suffix(
+		"returning id").RunWith(r.base).PlaceholderFormat(sq.Dollar)
 	for _, resume := range resumeArr {
 		query = query.Values(resume.DocumentId)
 	}
-	_, err := query.ExecContext(ctx)
-	if err == nil {
-		log.Err(err).Msgf("Error while trying to add resume %v", resumeArr)
-		return err
+	rows, err := query.QueryContext(ctx)
+	if err != nil {
+		log.Err(err).Msgf("Error while trying to add resumes")
+		return nil, err
 	}
-	log.Info().Msgf("%v resumes added", len(resumeArr))
-	return nil
+	defer rows.Close()
+	inserted := make([]uint64, 0)
+	for rows.Next() {
+		var resumeId uint64
+		if err := rows.Scan(&resumeId); err != nil {
+			log.Err(err).Msgf("Error while trying to list inserted resumes")
+			return inserted, err
+		}
+		inserted = append(inserted, resumeId)
+	}
+	return inserted, nil
 }
 
 func (r *repo) RemoveResumeById(ctx context.Context, resumeId uint) error {
