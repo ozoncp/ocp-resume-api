@@ -22,6 +22,7 @@ type Repo interface {
 
 type RepoResume interface {
 	AddResumes(ctx context.Context, resumeArr []resume.Resume) ([]uint64, error)
+	AddResumesBatch(ctx context.Context, resumeArr []resume.Resume) ([]uint64, error)
 	RemoveResumeById(ctx context.Context, resumeId uint) error
 	GetResumeById(ctx context.Context, resumeId uint) (*resume.Resume, error)
 	ListResumes(ctx context.Context, offset, limit uint64) ([]resume.Resume, error)

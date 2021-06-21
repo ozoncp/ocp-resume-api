@@ -64,7 +64,7 @@ func (f *flusher) FlushResumes(ctx context.Context, r []resume.Resume) ([]resume
 	}
 	retArr := make([]resume.Resume, 0, len(r))
 	for _, batch := range batches {
-		err := f.repoResume.AddResumes(ctx, batch)
+		_, err := f.repoResume.AddResumesBatch(ctx, batch)
 		if err != nil {
 			retArr = append(retArr, batch...)
 		}
