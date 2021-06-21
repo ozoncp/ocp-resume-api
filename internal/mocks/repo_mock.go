@@ -51,17 +51,33 @@ func (mr *MockRepoMockRecorder) AddAchievements(arg0, arg1 interface{}) *gomock.
 }
 
 // AddResumes mocks base method.
-func (m *MockRepo) AddResumes(arg0 context.Context, arg1 []resume.Resume) error {
+func (m *MockRepo) AddResumes(arg0 context.Context, arg1 []resume.Resume) ([]uint64, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "AddResumes", arg0, arg1)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].([]uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // AddResumes indicates an expected call of AddResumes.
 func (mr *MockRepoMockRecorder) AddResumes(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddResumes", reflect.TypeOf((*MockRepo)(nil).AddResumes), arg0, arg1)
+}
+
+// AddResumesBatch mocks base method.
+func (m *MockRepo) AddResumesBatch(arg0 context.Context, arg1 []resume.Resume) ([]uint64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddResumesBatch", arg0, arg1)
+	ret0, _ := ret[0].([]uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddResumesBatch indicates an expected call of AddResumesBatch.
+func (mr *MockRepoMockRecorder) AddResumesBatch(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddResumesBatch", reflect.TypeOf((*MockRepo)(nil).AddResumesBatch), arg0, arg1)
 }
 
 // GetResumeById mocks base method.
@@ -106,4 +122,18 @@ func (m *MockRepo) RemoveResumeById(arg0 context.Context, arg1 uint) error {
 func (mr *MockRepoMockRecorder) RemoveResumeById(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RemoveResumeById", reflect.TypeOf((*MockRepo)(nil).RemoveResumeById), arg0, arg1)
+}
+
+// UpdateResumeById mocks base method.
+func (m *MockRepo) UpdateResumeById(arg0 context.Context, arg1 uint, arg2 resume.Resume) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateResumeById", arg0, arg1, arg2)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateResumeById indicates an expected call of UpdateResumeById.
+func (mr *MockRepoMockRecorder) UpdateResumeById(arg0, arg1, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateResumeById", reflect.TypeOf((*MockRepo)(nil).UpdateResumeById), arg0, arg1, arg2)
 }
