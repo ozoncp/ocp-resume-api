@@ -10,6 +10,7 @@ service OcpResumeApi {
     rpc CreateResumeV1(CreateResumeV1Request) returns (CreateResumeV1Response) {
         option (google.api.http) = {
             post: "/v1/resumes"
+            body: "*"
         };
     
     }
@@ -18,13 +19,15 @@ service OcpResumeApi {
     rpc MultiCreateResumesV1(MultiCreateResumesV1Request) returns (MultiCreateResumesV1Response){
         option (google.api.http) = {
             post: "/v1/resumes_multi"
+            body: "*"
         };
     }
 
     // Обновляет поля сущность resume для указанного ResumeId
     rpc UpdateResumeV1(UpdateResumeV1Request) returns (UpdateResumeV1Response){
         option (google.api.http) = {
-            post: "/v1/resumes_upd/{ResumeId}"
+            put: "/v1/resumes/{ResumeId}"
+            body: "*"
         };
     }
 
@@ -47,7 +50,7 @@ service OcpResumeApi {
     // Удаляет сущность resume по указанному ResumeId
     rpc RemoveResumeV1(RemoveResumeV1Request) returns (RemoveResumeV1Response) {
         option (google.api.http) = {
-            post: "/v1/resumes/{ResumeId}"
+            delete: "/v1/resumes/{ResumeId}"
         };
     
     }

@@ -66,6 +66,16 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiCreateResumeV1Request"
+            }
+          }
+        ],
         "tags": [
           "OcpResumeApi"
         ]
@@ -102,7 +112,7 @@
           "OcpResumeApi"
         ]
       },
-      "post": {
+      "delete": {
         "summary": "Удаляет сущность resume по указанному ResumeId",
         "operationId": "OcpResumeApi_RemoveResumeV1",
         "responses": {
@@ -131,33 +141,8 @@
         "tags": [
           "OcpResumeApi"
         ]
-      }
-    },
-    "/v1/resumes_multi": {
-      "post": {
-        "summary": "Создает новые сущности resume и возвращает список добавленных идентификаторов",
-        "operationId": "OcpResumeApi_MultiCreateResumesV1",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/apiMultiCreateResumesV1Response"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "tags": [
-          "OcpResumeApi"
-        ]
-      }
-    },
-    "/v1/resumes_upd/{ResumeId}": {
-      "post": {
+      },
+      "put": {
         "summary": "Обновляет поля сущность resume для указанного ResumeId",
         "operationId": "OcpResumeApi_UpdateResumeV1",
         "responses": {
@@ -181,6 +166,47 @@
             "required": true,
             "type": "string",
             "format": "uint64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiUpdateResumeV1Request"
+            }
+          }
+        ],
+        "tags": [
+          "OcpResumeApi"
+        ]
+      }
+    },
+    "/v1/resumes_multi": {
+      "post": {
+        "summary": "Создает новые сущности resume и возвращает список добавленных идентификаторов",
+        "operationId": "OcpResumeApi_MultiCreateResumesV1",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/apiMultiCreateResumesV1Response"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/apiMultiCreateResumesV1Request"
+            }
           }
         ],
         "tags": [
@@ -190,6 +216,15 @@
     }
   },
   "definitions": {
+    "apiCreateResumeV1Request": {
+      "type": "object",
+      "properties": {
+        "DocumentId": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
     "apiCreateResumeV1Response": {
       "type": "object",
       "properties": {
@@ -208,6 +243,17 @@
       }
     },
     "apiListResumesV1Response": {
+      "type": "object",
+      "properties": {
+        "resumes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/apiResume"
+          }
+        }
+      }
+    },
+    "apiMultiCreateResumesV1Request": {
       "type": "object",
       "properties": {
         "resumes": {
@@ -248,6 +294,18 @@
         "DocumentId": {
           "type": "string",
           "format": "uint64"
+        }
+      }
+    },
+    "apiUpdateResumeV1Request": {
+      "type": "object",
+      "properties": {
+        "ResumeId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "resume": {
+          "$ref": "#/definitions/apiResume"
         }
       }
     },
