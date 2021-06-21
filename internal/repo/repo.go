@@ -61,12 +61,6 @@ func (r *repo) UpdateResumeById(ctx context.Context, resumeId uint, newData resu
 	if affected, err := result.RowsAffected(); err == nil && affected == 0 {
 		return errors.New("resume id not found")
 	}
-	_, err := query.ExecContext(ctx)
-	if err == nil {
-		log.Err(err).Msgf("Error while trying to add resume %v", resumeArr)
-		return err
-	}
-	log.Info().Msgf("%v resumes added", len(resumeArr))
 	return nil
 }
 
